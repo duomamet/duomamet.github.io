@@ -12,25 +12,47 @@
 
   <style>
     body {
-      background-color: #121212;
+      margin: 0;
+      padding: 0;
+      background: #121212;
       color: #fff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      overflow: hidden;
+    }
+    .background-blur {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(20px);
+      z-index: -1;
+      opacity: 0.5;
     }
     .player-card {
-      background-color: #1e1e1e;
+      background-color: rgba(0, 0, 0, 0.6);
       border-radius: 20px;
       padding: 30px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .song-cover {
+      width: 100%;
+      height: 300px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 20px;
+      margin-bottom: 20px;
     }
     .song-title {
-      margin: 20px 0;
+      margin: 15px 0;
       font-size: 1.4rem;
       font-weight: bold;
     }
@@ -39,7 +61,7 @@
       border: none;
       color: #fff;
       font-size: 1.8rem;
-      margin: 0 15px;
+      margin: 0 10px;
     }
     .controls button:hover {
       color: #1DB954;
@@ -57,10 +79,13 @@
     #volumeSlider {
       width: 100%;
       margin-top: 15px;
+      accent-color: #1DB954;
     }
     .playlist {
       margin-top: 30px;
       text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
     }
     .playlist-item {
       padding: 10px;
@@ -72,15 +97,16 @@
     }
     .active-song {
       color: #1DB954;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
+<div class="background-blur" id="backgroundBlur"></div>
+
 <div class="player-card">
-  <div class="mb-3">
-    <i class="fas fa-music fa-3x"></i>
-  </div>
+  <div id="coverArt" class="song-cover"></div>
   <div class="song-title" id="songTitle">Tekan Play</div>
 
   <div class="controls">
@@ -108,15 +134,17 @@
 
 <script>
   const songs = [
-    { title: "Berpayung Tuhan", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3" },
-    { title: "Lagu 2", file: "audio2.mp3" },
-    { title: "Lagu 3", file: "audio3.mp3" }
+    { title: "Lagu 1", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
+    { title: "Lagu 2", file: "audio2.mp3", cover: "cover2.jpg" },
+    { title: "Lagu 3", file: "audio3.mp3", cover: "cover3.jpg" }
   ];
 
   let currentIndex = 0;
   let isPlaying = false;
   const audio = document.getElementById('audioPlayer');
   const songTitle = document.getElementById('songTitle');
+  const coverArt = document.getElementById('coverArt');
+  const backgroundBlur = document.getElementById('backgroundBlur');
   const playPauseBtn = document.getElementById('playPauseBtn');
   const nextBtn = document.getElementById('nextBtn');
   const prevBtn = document.getElementById('prevBtn');
@@ -129,6 +157,8 @@
     const song = songs[index];
     audio.src = song.file;
     songTitle.textContent = song.title;
+    coverArt.style.backgroundImage = `url('${song.cover}')`;
+    backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
     highlightCurrentSong();
   }
 
