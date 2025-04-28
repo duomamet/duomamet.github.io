@@ -325,10 +325,17 @@ progressBarContainer.addEventListener('touchstart', () => {
   document.addEventListener('touchend', onDragEnd);
 });
 
-// Inisialisasi lagu pertama
-loadSong(currentIndex);
-playSong();
-loadPlaylist();
+// Fungsi untuk memulai lagu acak setelah halaman dimuat
+function startSong() {
+  loadSong(currentIndex); // Memuat lagu acak
+  playSong(); // Memutar lagu
+}
+
+// Panggil fungsi startSong() setelah halaman dimuat
+window.onload = function() {
+  startSong();
+  loadPlaylist();
+};
 </script>
 
 </body>
