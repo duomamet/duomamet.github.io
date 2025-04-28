@@ -157,7 +157,8 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>const songs = [
+<script>
+const songs = [
   { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
   { title: "Tapi Diterima", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Tapi%20Diterima%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
   { title: "Forgot Password", artist: "Hindia ft. Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Hindia%20ft.%20Nadin%20Amizah%20-%20Forgot%20Password%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/hindianadin.jpg" },
@@ -199,6 +200,7 @@ function loadSong(index) {
   backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
   document.title = song.title;
   highlightCurrentSong();
+  playSong(); // Menambahkan pemutaran otomatis saat lagu dimuat
 }
 
 // Fungsi untuk memulai lagu
@@ -228,7 +230,6 @@ function playPause() {
 function nextSong() {
   currentIndex = Math.floor(Math.random() * songs.length);
   loadSong(currentIndex);
-  playSong();
 }
 
 // Fungsi untuk memperbarui progress bar
@@ -277,7 +278,6 @@ function loadPlaylist() {
     div.addEventListener('click', () => {
       currentIndex = index;
       loadSong(currentIndex);
-      playSong();
     });
 
     // Menambahkan kelas aktif jika ini adalah lagu yang sedang diputar
