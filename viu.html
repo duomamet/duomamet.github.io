@@ -181,6 +181,7 @@
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
     document.title = song.title;  // Change web title to the song title
     highlightCurrentSong();
+    audio.load();  // Ensure audio metadata is loaded
   }
 
   function playSong() {
