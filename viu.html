@@ -54,6 +54,7 @@
       border-radius: 20px;
       position: relative;
       overflow: hidden;
+      transition: transform 0.3s ease; /* Efek geser */
     }
     .song-title {
       margin-top: 10px;
@@ -186,6 +187,9 @@
   const currentTimeEl = document.getElementById('currentTime');
   const totalDurationEl = document.getElementById('totalDuration');
 
+  let touchStartX = 0;
+  let touchEndX = 0;
+
   // Fungsi untuk memuat lagu
   function loadSong(index) {
     const song = songs[index];
@@ -224,13 +228,6 @@
   // Fungsi untuk lagu berikutnya (acak)
   function nextSong() {
     currentIndex = Math.floor(Math.random() * songs.length);
-    loadSong(currentIndex);
-    playSong();
-  }
-
-  // Fungsi untuk lagu sebelumnya
-  function prevSong() {
-    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
     loadSong(currentIndex);
     playSong();
   }
@@ -291,9 +288,8 @@
   // Event listener untuk tombol play/pause
   playPauseBtn.addEventListener('click', playPause);
 
-  // Event listener untuk tombol next/prev
+  // Event listener untuk tombol next
   nextBtn.addEventListener('click', nextSong);
-  prevBtn.addEventListener('click', prevSong);
 
   // Event listener untuk memperbarui progress
   audio.addEventListener('timeupdate', updateProgress);
@@ -301,27 +297,52 @@
   // Event listener untuk autoplay setelah lagu selesai
   audio.addEventListener('ended', nextSong);
 
-  // Swipe detection
-  let touchStartX = 0;
-  let touchEndX = 0;
+  // Fungsi untuk mendukung dragging pada progress bar
+  function onDragMove(event) {
+    const width = progressBarContainer.offsetWidth;
+    const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
+    const progress = Math.min(Math.max(offsetX / width, 0), 1);
+    progressBar.style.width = `${progress * 100}%`;
+    audio.currentTime = progress * audio.duration;
+  }
 
+  function onDragEnd() {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+  }
+
+  progressBarContainer.addEventListener('mousedown', () => {
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+  });
+
+  progressBarContainer.addEventListener('touchstart', () => {
+    document.addEventListener('touchmove', onDragMove);
+    document.addEventListener('touchend', onDragEnd);
+  });
+
+  // Fungsi untuk mendeteksi swipe
   coverArt.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].screenX;
   });
 
-  coverArt.addEventListener('touchend', (e) => {
+  coverArt.addEventListener('touchmove', (e) => {
     touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
+    const diff = touchStartX - touchEndX;
+    if (diff > 30) { // Deteksi swipe kiri
+      coverArt.style.transform = `translateX(-100%)`; // Efek geser
+    }
   });
 
-  function handleSwipe() {
-    if (touchEndX < touchStartX) {
-      nextSong(); // Swipe left (next song)
+  coverArt.addEventListener('touchend', () => {
+    if (touchStartX - touchEndX > 30) {
+      nextSong(); // Pindah ke lagu berikutnya jika geser kiri
+    } else {
+      coverArt.style.transform = 'translateX(0)'; // Reset posisi jika tidak geser kiri
     }
-    if (touchEndX > touchStartX) {
-      prevSong(); // Swipe right (previous song)
-    }
-  }
+  });
 
   // Inisialisasi lagu pertama
   loadSong(currentIndex);
