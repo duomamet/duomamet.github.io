@@ -79,7 +79,6 @@
       border-radius: 5px;
       overflow: hidden;
       cursor: pointer;
-      position: relative;
     }
     .progress-bar {
       background-color: #1DB954;
@@ -124,9 +123,9 @@
 
   <div class="progress mt-3" id="progressBarContainer">
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
-    <!-- Elemen untuk waktu yang sedang berjalan -->
-    <span id="currentTime" class="current-time">0:00</span> 
   </div>
+
+  <div id="currentTime" class="current-time">0:00</div> <!-- Waktu ditampilkan di bawah progress bar -->
 
   <div class="controls mt-3">
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
@@ -209,6 +208,10 @@
     if (audio.duration) {
       const progressPercent = (audio.currentTime / audio.duration) * 100;
       progressBar.style.width = `${progressPercent}%`;
+
+      // Debugging: Cek nilai durasi dan waktu yang sedang diputar
+      console.log("Audio Duration:", audio.duration);
+      console.log("Audio Current Time:", audio.currentTime);
 
       // Menampilkan waktu yang sedang diputar
       const minutes = Math.floor(audio.currentTime / 60);
