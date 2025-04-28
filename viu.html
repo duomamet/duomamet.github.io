@@ -54,7 +54,7 @@
       border-radius: 20px;
       position: relative;
       overflow: hidden;
-      transition: transform 0.3s ease; /* Efek geser */
+      transition: transform 0.5s ease; /* Memperpanjang durasi transisi */
     }
     .song-title {
       margin-top: 10px;
@@ -313,14 +313,16 @@
 
   coverArt.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
-    if (touchStartX - touchEndX > 30) { // Jika geser ke kiri lebih dari 30px
-      coverArt.style.transition = "transform 0.3s ease"; // Pastikan animasi berjalan
-      coverArt.style.transform = "translateX(-100%)"; // Geser gambar ke kiri
+    if (touchEndX < touchStartX) {
+      coverArt.style.transition = "transform 0.5s ease";
+      coverArt.style.transform = "translateX(-100%)";
+      
+      // Memuat dan memulai lagu berikutnya
       setTimeout(() => {
-        nextSong(); // Pindah ke lagu berikutnya
-        coverArt.style.transition = "transform 0.3s ease"; // Animasi geser
-        coverArt.style.transform = "translateX(0%)"; // Kembali ke tengah
-      }, 300); // Tunggu animasi selesai
+        nextSong();
+        coverArt.style.transition = "transform 0.5s ease";
+        coverArt.style.transform = "translateX(0%)";
+      }, 500);
     }
   });
 
