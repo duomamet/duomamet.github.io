@@ -219,16 +219,16 @@ function playPause() {
   }
 }
 
-// Fungsi untuk lagu berikutnya (acak)
+// Fungsi untuk lagu berikutnya
 function nextSong() {
-  currentIndex = Math.floor(Math.random() * songs.length);
+  currentIndex = (currentIndex + 1) % songs.length; // Berurutan mengikuti playlist
   loadSong(currentIndex);
   playSong();
 }
 
 // Fungsi untuk lagu sebelumnya
 function prevSong() {
-  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length; // Berurutan mengikuti playlist
   loadSong(currentIndex);
   playSong();
 }
@@ -269,7 +269,7 @@ function highlightCurrentSong() {
 
 // Fungsi untuk memuat playlist
 function loadPlaylist() {
-  // Acak urutan lagu dalam playlist
+  // Acak urutan lagu hanya saat pertama kali dimuat
   const shuffledSongs = [...songs];
   shuffledSongs.sort(() => Math.random() - 0.5);
 
