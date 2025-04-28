@@ -106,7 +106,8 @@
     border-bottom: 1px solid #333;
     cursor: pointer;
   }
-    
+  .playlist-item:hover {
+    background-color: #2a2a2a;
   }
   .active-song {
     color: #1DB954;
@@ -271,27 +272,38 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Progress Bar Events
-  progressContainer.addEventListener('mousedown', (e) => {
-    isDragging = true;
+  // Progress Bar Events for Mouse and Touchscreen
+  function updateProgressBar(e) {
     const progressWidth = progressContainer.offsetWidth;
-    const offsetX = e.offsetX;
+    const offsetX = e.type.startsWith('touch') ? e.touches[0].clientX : e.offsetX;
     const progressPercent = (offsetX / progressWidth) * 100;
     progressBar.style.width = `${progressPercent}%`;
     audio.currentTime = (audio.duration * progressPercent) / 100;
+  }
+
+  progressContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    updateProgressBar(e);
+  });
+
+  progressContainer.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    updateProgressBar(e);
   });
 
   document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      const progressWidth = progressContainer.offsetWidth;
-      const offsetX = e.offsetX;
-      const progressPercent = (offsetX / progressWidth) * 100;
-      progressBar.style.width = `${progressPercent}%`;
-      audio.currentTime = (audio.duration * progressPercent) / 100;
-    }
+    if (isDragging) updateProgressBar(e);
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (isDragging) updateProgressBar(e);
   });
 
   document.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  document.addEventListener('touchend', () => {
     isDragging = false;
   });
 
