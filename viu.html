@@ -79,9 +79,20 @@
     margin-top: 20px;
     border-radius: 5px;
     overflow: hidden;
+    position: relative;
   }
   .progress-bar {
     background-color: #1DB954;
+  }
+  .progress-time {
+    position: absolute;
+    bottom: -20px;
+    font-size: 0.8rem;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 10px;
   }
   .playlist {
     margin-top: 30px;
@@ -115,6 +126,10 @@
 
   <div class="progress mt-3">
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+    <div class="progress-time">
+      <span id="currentTime">0:00</span>
+      <span id="totalTime">0:00</span>
+    </div>
   </div>
 
   <div class="controls mt-3">
@@ -149,6 +164,14 @@
   const prevBtn = document.getElementById('prevBtn');
   const progressBar = document.getElementById('progressBar');
   const playlist = document.getElementById('playlist');
+  const currentTimeElement = document.getElementById('currentTime');
+  const totalTimeElement = document.getElementById('totalTime');
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
 
   function loadSong(index) {
     const song = songs[index];
@@ -196,6 +219,9 @@
     if (audio.duration) {
       const progressPercent = (audio.currentTime / audio.duration) * 100;
       progressBar.style.width = `${progressPercent}%`;
+
+      currentTimeElement.textContent = formatTime(audio.currentTime);
+      totalTimeElement.textContent = formatTime(audio.duration);
     }
   }
 
@@ -241,7 +267,8 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Init
+  // Init (acak lagu ketika pertama kali dimuat)
+  currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak
   loadSong(currentIndex);
   playSong();
   loadPlaylist();
