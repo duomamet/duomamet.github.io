@@ -49,16 +49,21 @@
       background-size: cover;
       background-position: center;
       border-radius: 20px;
-      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
     }
     .song-title {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 8px 12px;
-      border-radius: 10px;
-      display: inline-block;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
       font-size: 1.2rem;
       font-weight: bold;
-      margin-bottom: 15px;
+      text-align: center;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
     }
     .controls button {
       background: none;
@@ -110,8 +115,9 @@
 <div class="background-blur" id="backgroundBlur"></div>
 
 <div class="player-card">
-  <div id="coverArt" class="song-cover"></div>
-  <div class="song-title" id="songTitle">Tekan Play</div>
+  <div id="coverArt" class="song-cover">
+    <div class="song-title" id="songTitle">Tekan Play</div>
+  </div>
 
   <div class="controls">
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
