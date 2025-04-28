@@ -121,7 +121,6 @@
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
-    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
   </div>
 
   <div class="playlist" id="playlist"></div>
@@ -139,7 +138,6 @@
     { title: "Lagu 3", file: "audio3.mp3", cover: "cover3.jpg" }
   ];
 
-
   let currentIndex = 0;
   let isPlaying = false;
   const audio = document.getElementById('audioPlayer');
@@ -149,7 +147,6 @@
   const playPauseBtn = document.getElementById('playPauseBtn');
   const nextBtn = document.getElementById('nextBtn');
   const prevBtn = document.getElementById('prevBtn');
-  const shuffleBtn = document.getElementById('shuffleBtn');
   const progressBar = document.getElementById('progressBar');
   const playlist = document.getElementById('playlist');
 
@@ -193,14 +190,6 @@
     currentIndex = (currentIndex - 1 + songs.length) % songs.length;
     loadSong(currentIndex);
     playSong();
-  }
-
-  function shuffleSongs() {
-    songs.sort(() => Math.random() - 0.5);
-    currentIndex = 0;
-    loadSong(currentIndex);
-    playSong();
-    loadPlaylist();
   }
 
   function updateProgress() {
@@ -248,12 +237,11 @@
   playPauseBtn.addEventListener('click', playPause);
   nextBtn.addEventListener('click', nextSong);
   prevBtn.addEventListener('click', prevSong);
-  shuffleBtn.addEventListener('click', shuffleSongs);
 
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Init
+  // Init (acak lagu ketika pertama kali dimuat)
   currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak
   loadSong(currentIndex);
   playSong();
