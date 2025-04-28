@@ -173,6 +173,7 @@ const songs = [
 
 let currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak pertama
 let isPlaying = false;
+let playedSongs = []; // Array untuk menyimpan lagu yang sudah diputar
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
@@ -195,12 +196,12 @@ function loadSong(index) {
   const song = songs[index];
   audio.src = song.file;
   songTitle.textContent = song.title;
-  artistName.textContent = song.artist;  // Menampilkan nama artis
+  artistName.textContent = song.artist;
   coverArt.style.backgroundImage = `url('${song.cover}')`;
   backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
   document.title = song.title;
   highlightCurrentSong();
-  playSong(); // Menambahkan pemutaran otomatis saat lagu dimuat
+  playSong();
 }
 
 // Fungsi untuk memulai lagu
@@ -226,9 +227,24 @@ function playPause() {
   }
 }
 
-// Fungsi untuk lagu berikutnya (acak)
+// Fungsi untuk memilih lagu acak berikutnya yang belum diputar
 function nextSong() {
-  currentIndex = Math.floor(Math.random() * songs.length);
+  let randomIndex;
+
+  // Cari lagu yang belum diputar
+  do {
+    randomIndex = Math.floor(Math.random() * songs.length);
+  } while (playedSongs.includes(randomIndex) && playedSongs.length < songs.length);
+
+  // Jika semua lagu sudah diputar, reset playedSongs
+  if (playedSongs.length === songs.length) {
+    playedSongs = [];
+  }
+
+  // Menambahkan lagu yang sedang diputar ke playedSongs
+  playedSongs.push(randomIndex);
+
+  currentIndex = randomIndex;
   loadSong(currentIndex);
 }
 
@@ -266,31 +282,23 @@ function highlightCurrentSong() {
   });
 }
 
-// Fungsi untuk memuat playlist dan menyorot lagu yang sedang aktif
+// Fungsi untuk memuat playlist
 function loadPlaylist() {
-  playlist.innerHTML = ''; // Kosongkan playlist
+  playlist.innerHTML = '';
   songs.forEach((song, index) => {
     const div = document.createElement('div');
     div.className = 'playlist-item';
     div.textContent = song.title;
-    
-    // Tambahkan event listener untuk klik pada lagu di playlist
     div.addEventListener('click', () => {
       currentIndex = index;
       loadSong(currentIndex);
+      playSong();
     });
-
-    // Menambahkan kelas aktif jika ini adalah lagu yang sedang diputar
     if (index === currentIndex) {
       div.classList.add('active-song');
     }
-
-    // Menambahkan elemen ke dalam playlist
     playlist.appendChild(div);
   });
-
-  // Panggil highlightCurrentSong() setelah playlist dimuat
-  highlightCurrentSong();
 }
 
 // Event listener untuk tombol play/pause
@@ -324,7 +332,7 @@ coverArt.addEventListener('touchend', (e) => {
   if (touchEndX < touchStartX) {
     coverArt.style.transition = "transform 0.5s ease";
     coverArt.style.transform = "translateX(-100%)";
-    
+
     // Memuat dan memulai lagu berikutnya
     setTimeout(() => {
       nextSong();
