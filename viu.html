@@ -10,107 +10,59 @@
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #121212;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-    }
-    .background-blur {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      filter: blur(20px);
-      z-index: -1;
-      opacity: 0.5;
-    }
-    .player-card {
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 20px;
-      padding: 30px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-      text-align: center;
-      backdrop-filter: blur(10px);
-      font-family: 'Poppins', sans-serif;
-    }
-    .song-cover {
-      width: 100%;
-      height: 300px;
-      background-size: cover;
-      background-position: center;
-      border-radius: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .song-title {
-      margin-top: 10px;
-      font-size: 1.2rem;
-      font-weight: 600;
-      text-align: center;
-    }
-    .controls button {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.8rem;
-      margin: 0 10px;
-      transition: transform 0.3s ease;
-    }
-    .controls button:active {
-      transform: scale(1);
-      color: #1DB954;
-    }
-    .progress {
-      height: 5px;
-      background: #555;
-      margin-top: 20px;
-      border-radius: 5px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .progress-bar {
-      background-color: #1DB954;
-      height: 100%;
-    }
-    .time-info {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 5px;
-      font-size: 0.9rem;
-      color: #fff;
-      padding: 0 5px;
-    }
-    .playlist {
-      margin-top: 30px;
-      text-align: left;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .playlist-item {
-      padding: 10px;
-      border-bottom: 1px solid #333;
-      cursor: pointer;
-    }
-    .playlist-item:hover {
-      background-color: #2a2a2a;
-    }
-    .active-song {
-      color: #1DB954;
-      font-weight: bold;
-    }
-  </style>
+ <style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: #121212;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Menghapus scroll pada body */
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .player-card {
+    position: fixed; /* Menjadikan card tetap di posisi tetap */
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%); /* Menempatkan card di tengah layar */
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden; /* Menghapus scroll pada card */
+  }
+
+  .playlist {
+    margin-top: 30px;
+    text-align: left;
+    max-height: 200px;
+    overflow-y: hidden; /* Menghapus scrollbar pada playlist */
+  }
+
+  .playlist-item {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+  }
+
+  .playlist-item:hover {
+    background-color: #2a2a2a;
+  }
+
+  .active-song {
+    color: #1DB954;
+    font-weight: bold;
+  }
+</style>
+
 </head>
 
 <body>
@@ -219,16 +171,16 @@ function playPause() {
   }
 }
 
-// Fungsi untuk lagu berikutnya
+// Fungsi untuk lagu berikutnya (acak)
 function nextSong() {
-  currentIndex = (currentIndex + 1) % songs.length; // Berurutan mengikuti playlist
+  currentIndex = Math.floor(Math.random() * songs.length);
   loadSong(currentIndex);
   playSong();
 }
 
 // Fungsi untuk lagu sebelumnya
 function prevSong() {
-  currentIndex = (currentIndex - 1 + songs.length) % songs.length; // Berurutan mengikuti playlist
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
   loadSong(currentIndex);
   playSong();
 }
@@ -269,17 +221,13 @@ function highlightCurrentSong() {
 
 // Fungsi untuk memuat playlist
 function loadPlaylist() {
-  // Acak urutan lagu hanya saat pertama kali dimuat
-  const shuffledSongs = [...songs];
-  shuffledSongs.sort(() => Math.random() - 0.5);
-
   playlist.innerHTML = '';
-  shuffledSongs.forEach((song, index) => {
+  songs.forEach((song, index) => {
     const div = document.createElement('div');
     div.className = 'playlist-item';
     div.textContent = song.title;
     div.addEventListener('click', () => {
-      currentIndex = songs.indexOf(song); // Temukan index lagu yang sebenarnya
+      currentIndex = index;
       loadSong(currentIndex);
       playSong();
     });
@@ -329,17 +277,10 @@ progressBarContainer.addEventListener('touchstart', () => {
   document.addEventListener('touchend', onDragEnd);
 });
 
-// Fungsi untuk memulai lagu acak setelah halaman dimuat
-function startSong() {
-  loadSong(currentIndex); // Memuat lagu acak
-  playSong(); // Memutar lagu
-}
-
-// Panggil fungsi startSong() setelah halaman dimuat
-window.onload = function() {
-  startSong();
-  loadPlaylist();
-};
+// Inisialisasi lagu pertama
+loadSong(currentIndex);
+playSong();
+loadPlaylist();
 </script>
 
 </body>
