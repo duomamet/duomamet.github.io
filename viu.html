@@ -244,23 +244,32 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Allow dragging to change progress
+  // Allow dragging to change progress (Mouse and Touch)
+  function onDragMove(event) {
+    const width = progressBarContainer.offsetWidth;
+    const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
+    const progress = Math.min(Math.max(offsetX / width, 0), 1);
+    progressBar.style.width = `${progress * 100}%`;
+    audio.currentTime = progress * audio.duration;
+  }
+
+  function onDragEnd() {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+  }
+
+  // Mouse Events
   progressBarContainer.addEventListener('mousedown', (event) => {
-    const onMouseMove = (moveEvent) => {
-      const width = progressBarContainer.offsetWidth;
-      const offsetX = moveEvent.clientX - progressBarContainer.getBoundingClientRect().left;
-      const progress = Math.min(Math.max(offsetX / width, 0), 1);
-      progressBar.style.width = `${progress * 100}%`;
-      audio.currentTime = progress * audio.duration;
-    };
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+  });
 
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+  // Touch Events
+  progressBarContainer.addEventListener('touchstart', (event) => {
+    document.addEventListener('touchmove', onDragMove);
+    document.addEventListener('touchend', onDragEnd);
   });
 
   // Init (acak lagu ketika pertama kali dimuat)
