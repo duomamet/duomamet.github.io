@@ -56,14 +56,10 @@
     overflow: hidden;
   }
   .song-title {
-    position: relative;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px;
+    margin-top: 10px;
     font-size: 1.2rem;
     font-weight: 600; /* Menambah ketebalan font untuk mirip dengan Spotify */
     text-align: center;
-    border-radius: 20px;
-    margin-top: 10px;
   }
   .controls button {
     background: none;
@@ -123,6 +119,10 @@
 
   <div class="song-title" id="songTitle">Tekan Play</div>
 
+  <div class="progress mt-3">
+    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+  </div>
+
   <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
 
   <div class="controls mt-3">
@@ -130,10 +130,6 @@
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
     <button id="shuffleBtn"><i class="fas fa-random"></i></button>
-  </div>
-
-  <div class="progress mt-3">
-    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
   </div>
 
   <div class="playlist" id="playlist"></div>
