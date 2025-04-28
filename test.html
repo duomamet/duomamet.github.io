@@ -10,7 +10,6 @@
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
-  
   <style>
   body {
     margin: 0;
@@ -22,7 +21,7 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
+    font-family: 'Poppins', sans-serif;
   }
   .background-blur {
     position: fixed;
@@ -44,7 +43,7 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.7);
     text-align: center;
     backdrop-filter: blur(10px);
-    font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
+    font-family: 'Poppins', sans-serif;
   }
   .song-cover {
     width: 100%;
@@ -58,7 +57,7 @@
   .song-title {
     margin-top: 10px;
     font-size: 1.2rem;
-    font-weight: 600; /* Menambah ketebalan font untuk mirip dengan Spotify */
+    font-weight: 600;
     text-align: center;
   }
   .controls button {
@@ -83,11 +82,6 @@
   }
   .progress-bar {
     background-color: #1DB954;
-  }
-  #volumeSlider {
-    width: 100%;
-    margin-top: 15px;
-    accent-color: #1DB954;
   }
   .playlist {
     margin-top: 30px;
@@ -123,8 +117,6 @@
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
   </div>
 
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-
   <div class="controls mt-3">
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
@@ -158,7 +150,6 @@
   const prevBtn = document.getElementById('prevBtn');
   const shuffleBtn = document.getElementById('shuffleBtn');
   const progressBar = document.getElementById('progressBar');
-  const volumeSlider = document.getElementById('volumeSlider');
   const playlist = document.getElementById('playlist');
 
   function loadSong(index) {
@@ -167,6 +158,7 @@
     songTitle.textContent = song.title;
     coverArt.style.backgroundImage = `url('${song.cover}')`;
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
+    document.title = song.title;  // Change web title to the song title
     highlightCurrentSong();
   }
 
@@ -230,18 +222,26 @@
 
   function loadPlaylist() {
     playlist.innerHTML = '';
+    // Display the current song at the top of the playlist
+    const currentSong = songs[currentIndex];
+    const div = document.createElement('div');
+    div.className = 'playlist-item active-song';
+    div.textContent = currentSong.title;
+    playlist.appendChild(div);
+    // Add other songs to the playlist below the current song
     songs.forEach((song, index) => {
-      const div = document.createElement('div');
-      div.className = 'playlist-item';
-      div.textContent = song.title;
-      div.addEventListener('click', () => {
-        currentIndex = index;
-        loadSong(currentIndex);
-        playSong();
-      });
-      playlist.appendChild(div);
+      if (index !== currentIndex) {
+        const div = document.createElement('div');
+        div.className = 'playlist-item';
+        div.textContent = song.title;
+        div.addEventListener('click', () => {
+          currentIndex = index;
+          loadSong(currentIndex);
+          playSong();
+        });
+        playlist.appendChild(div);
+      }
     });
-    highlightCurrentSong();
   }
 
   playPauseBtn.addEventListener('click', playPause);
@@ -251,10 +251,6 @@
 
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
-
-  volumeSlider.addEventListener('input', () => {
-    audio.volume = volumeSlider.value;
-  });
 
   // Init
   currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak
