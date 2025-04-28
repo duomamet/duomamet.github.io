@@ -22,6 +22,7 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
   }
   .background-blur {
     position: fixed;
@@ -43,6 +44,7 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.7);
     text-align: center;
     backdrop-filter: blur(10px);
+    font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
   }
   .song-cover {
     width: 100%;
@@ -61,7 +63,7 @@
     background: rgba(0, 0, 0, 0.6);
     padding: 10px;
     font-size: 1.2rem;
-    font-weight: bold;
+    font-weight: 600; /* Menambah ketebalan font untuk mirip dengan Spotify */
     text-align: center;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
@@ -74,10 +76,7 @@
     margin: 0 10px;
     transition: transform 0.3s ease;
   }
-  .controls button:hover {
-    color: #1DB954;
-    transform: scale(1.2);
-  }
+ 
   .controls button:active {
     transform: scale(1);
     color: #1DB954;
