@@ -3,163 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Radio Shuffle</title>
+  <title>My Shuffle Music</title>
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome CSS -->
+  <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
   <style>
     body {
+      background-color: #121212;
+      color: #fff;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: white;
-      text-align: center;
       padding: 20px;
-      transition: background 1s ease, background-color 0.5s;
     }
-    .player-container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
+    .player-card {
+      background-color: #1e1e1e;
       border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      width: 90%;
-      max-width: 450px;
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      text-align: center;
     }
-    .btn-custom {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      font-size: 1.1rem;
-    }
-    #current-song {
-      margin-top: 15px;
-      font-size: 1.1rem;
+    .song-title {
+      margin: 20px 0;
+      font-size: 1.4rem;
       font-weight: bold;
     }
+    .controls button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.8rem;
+      margin: 0 15px;
+    }
+    .controls button:hover {
+      color: #1DB954;
+    }
     .progress {
-      height: 10px;
+      height: 5px;
+      background: #555;
       margin-top: 20px;
-      background-color: rgba(255,255,255,0.3);
+      border-radius: 5px;
+      overflow: hidden;
     }
     .progress-bar {
-      background-color: #ffeb3b;
+      background-color: #1DB954;
     }
-    #toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
+    #volumeSlider {
+      width: 100%;
+      margin-top: 15px;
     }
-    #volume-control {
-      margin-top: 20px;
+    .playlist {
+      margin-top: 30px;
+      text-align: left;
     }
-    #time-info {
-      margin-top: 10px;
-      font-size: 0.9rem;
+    .playlist-item {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      cursor: pointer;
     }
-    .dark-mode {
-      background-color: #121212 !important;
-      color: white;
+    .playlist-item:hover {
+      background-color: #2a2a2a;
     }
-    .light-mode {
-      background-color: #f4f4f4 !important;
-      color: black;
+    .active-song {
+      color: #1DB954;
     }
   </style>
 </head>
-<body class="dark-mode">
+<body>
 
-<div class="player-container">
-  <h1 class="mb-4">
-    <i id="radio-icon" class="fas fa-radio fa-2x"></i><br> 
-    My Radio Shuffle
-  </h1>
+<div class="player-card">
+  <div class="mb-3">
+    <i class="fas fa-music fa-3x"></i>
+  </div>
+  <div class="song-title" id="songTitle">Tekan Play</div>
 
-  <button id="startButton" class="btn btn-light btn-custom">
-    <i class="fas fa-play"></i> Start Radio
-  </button>
-
-  <div id="control-buttons" class="d-none">
-    <button id="prevButton" class="btn btn-outline-light btn-custom">
-      <i class="fas fa-backward"></i>
-    </button>
-    <button id="nextButton" class="btn btn-outline-light btn-custom">
-      <i class="fas fa-forward"></i>
-    </button>
-    <button id="shuffleButton" class="btn btn-outline-warning btn-custom">
-      <i class="fas fa-random"></i>
-    </button>
-    <button id="themeButton" class="btn btn-outline-info btn-custom">
-      <i class="fas fa-adjust"></i> Mode
-    </button>
+  <div class="controls">
+    <button id="prevBtn"><i class="fas fa-backward"></i></button>
+    <button id="playPauseBtn"><i class="fas fa-play"></i></button>
+    <button id="nextBtn"><i class="fas fa-forward"></i></button>
+    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
   </div>
 
-  <audio id="player" class="d-none"></audio>
-
-  <div id="current-song" class="d-none mt-3">
-    🎵 Now Playing: <span id="song-title"></span>
+  <div class="progress mt-3">
+    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
   </div>
 
-  <div class="progress d-none" id="progress-container">
-    <div class="progress-bar" id="progress-bar" role="progressbar"></div>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+
+  <div class="playlist" id="playlist">
+    <!-- List lagu muncul di sini -->
   </div>
 
-  <div id="time-info" class="d-none">00:00 / 00:00</div>
-
-  <div id="volume-control" class="d-none">
-    <label for="volumeSlider" class="form-label">Volume</label>
-    <input type="range" class="form-range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-  </div>
+  <audio id="audioPlayer" class="d-none"></audio>
 </div>
-
-<!-- Toast Container -->
-<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   const songs = [
-    { src: 'lagu1.mp3', title: 'Judul Lagu 1', bg: 'linear-gradient(to right, #ff7e5f, #feb47b)' },
-    { src: 'lagu2.mp3', title: 'Judul Lagu 2', bg: 'linear-gradient(to right, #6a11cb, #2575fc)' },
-    { src: 'lagu3.mp3', title: 'Judul Lagu 3', bg: 'linear-gradient(to right, #11998e, #38ef7d)' }
+    { title: "Lagu 1", file: "audio1.mp3" },
+    { title: "Lagu 2", file: "audio2.mp3" },
+    { title: "Lagu 3", file: "audio3.mp3" }
   ];
 
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+  let currentIndex = 0;
+  let isPlaying = false;
+  const audio = document.getElementById('audioPlayer');
+  const songTitle = document.getElementById('songTitle');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const progressBar = document.getElementById('progressBar');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const playlist = document.getElementById('playlist');
+
+  function loadSong(index) {
+    const song = songs[index];
+    audio.src = song.file;
+    songTitle.textContent = song.title;
+    highlightCurrentSong();
+  }
+
+  function playSong() {
+    audio.play();
+    isPlaying = true;
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  }
+
+  function pauseSong() {
+    audio.pause();
+    isPlaying = false;
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  }
+
+  function playPause() {
+    if (isPlaying) {
+      pauseSong();
+    } else {
+      playSong();
     }
   }
 
-  shuffle(songs);
+  function nextSong() {
+    currentIndex = (currentIndex + 1) % songs.length;
+    loadSong(currentIndex);
+    playSong();
+  }
 
-  let currentSong = 0;
-  const player = document.getElementById('player');
-  const startButton = document.getElementById('startButton');
-  const prevButton = document.getElementById('prevButton');
-  const nextButton = document.getElementById('nextButton');
-  const shuffleButton = document.getElementById('shuffleButton');
-  const themeButton = document.getElementById('themeButton');
-  const controlButtons = document.getElementById('control-buttons');
-  const currentSongDiv = document.getElementById('current-song');
-  const songTitleSpan = document.getElementById('song-title');
-  const progressContainer = document.getElementById('progress-container');
-  const progressBar = document.getElementById('progress-bar');
-  const toastContainer = document.getElementById('toast-container');
-  const volumeSlider = document.getElementById('volumeSlider');
-  const volumeControl = document.getElementById('volume-control');
-  const timeInfo = document.getElementById('time-info');
-  let isDarkMode = true;
+  function prevSong() {
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(currentIndex);
+    playSong();
+  }
 
-  function playSong(index) {
-    player.src = songs[index].src;
-    player.play();
-    songTitleSpan.textContent = songs[index].title;
-    currentSongDiv.classList.remove('d-none');
-    progressContainer.classList.remove('d-none');
-    volumeControl.classList.remove('d-
+  function shuffleSongs() {
+    songs.sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    loadSong(currentIndex);
+    playSong();
+    loadPlaylist();
+  }
+
+  function updateProgress() {
+    if (audio.duration) {
+      const progressPercent = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+    }
+  }
+
+  function highlightCurrentSong() {
+    const items = document.querySelectorAll('.playlist-item');
+    items.forEach((item, index) => {
+      if (index === currentIndex) {
+        item.classList.add('active-song');
+      } else {
+        item.classList.remove('active-song');
+      }
+    });
+  }
+
+  function loadPlaylist() {
+    playlist.innerHTML = '';
+    songs.forEach((song, index) => {
+      const div = document.createElement('div');
+      div.className = 'playlist-item';
+      div.textContent = song.title;
+      div.addEventListener('click', () => {
+        currentIndex = index;
+        loadSong(currentIndex);
+        playSong();
+      });
+      playlist.appendChild(div);
+    });
+    highlightCurrentSong();
+  }
+
+  playPauseBtn.addEventListener('click', playPause);
+  nextBtn.addEventListener('click', nextSong);
+  prevBtn.addEventListener('click', prevSong);
+  shuffleBtn.addEventListener('click', shuffleSongs);
+
+  audio.addEventListener('timeupdate', updateProgress);
+  audio.addEventListener('ended', nextSong);
+
+  volumeSlider.addEventListener('input', () => {
+    audio.volume = volumeSlider.value;
+  });
+
+  // Init
+  loadSong(currentIndex);
+  loadPlaylist();
+</script>
+
+</body>
+</html>
