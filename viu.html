@@ -10,107 +10,113 @@
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
+  
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #121212;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-    .background-blur {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      filter: blur(20px);
-      z-index: -1;
-      opacity: 0.5;
-    }
-    .player-card {
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 20px;
-      padding: 30px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-      text-align: center;
-      backdrop-filter: blur(10px);
-    }
-    .song-cover {
-      width: 100%;
-      height: 300px;
-      background-size: cover;
-      background-position: center;
-      border-radius: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .song-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-align: center;
-      border-bottom-left-radius: 20px;
-      border-bottom-right-radius: 20px;
-    }
-    .controls button {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.8rem;
-      margin: 0 10px;
-      transition: transform 0.3s ease;
-    }
-    .controls button:hover {
-      color: #1DB954;
-      transform: scale(1.2);
-    }
-    .progress {
-      height: 5px;
-      background: #555;
-      margin-top: 20px;
-      border-radius: 5px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      background-color: #1DB954;
-    }
-    #volumeSlider {
-      width: 100%;
-      margin-top: 15px;
-      accent-color: #1DB954;
-    }
-    .playlist {
-      margin-top: 30px;
-      text-align: left;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .playlist-item {
-      padding: 10px;
-      border-bottom: 1px solid #333;
-      cursor: pointer;
-    }
-    .playlist-item:hover {
-      background-color: #2a2a2a;
-    }
-    .active-song {
-      color: #1DB954;
-      font-weight: bold;
-    }
-  </style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: #121212;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .background-blur {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    z-index: -1;
+    opacity: 0.5;
+  }
+  .player-card {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .song-cover {
+    width: 100%;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .song-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+  .controls button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+  }
+  .controls button:hover {
+    color: #1DB954;
+    transform: scale(1.2);
+  }
+  .controls button:active {
+    transform: scale(1);
+    color: #1DB954;
+  }
+  .progress {
+    height: 5px;
+    background: #555;
+    margin-top: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    background-color: #1DB954;
+  }
+  #volumeSlider {
+    width: 100%;
+    margin-top: 15px;
+    accent-color: #1DB954;
+  }
+  .playlist {
+    margin-top: 30px;
+    text-align: left;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .playlist-item {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+  }
+  .playlist-item:hover {
+    background-color: #2a2a2a;
+  }
+  .active-song {
+    color: #1DB954;
+    font-weight: bold;
+  }
+</style>
+
 </head>
 <body>
 
