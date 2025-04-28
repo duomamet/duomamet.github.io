@@ -171,92 +171,81 @@ const songs = [
   { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
 ];
 
-let currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak pertama
+let currentIndex = 0; // Set default index to 0
 let isPlaying = false;
-let playedSongs = []; // Array untuk menyimpan lagu yang sudah diputar
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
 const coverArt = document.getElementById('coverArt');
-const backgroundBlur = document.getElementById('backgroundBlur');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
 const progressBar = document.getElementById('progressBar');
-const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
-let touchStartX = 0;
-let touchEndX = 0;
+// Array untuk melacak lagu yang sudah diputar
+let playedSongs = [];
 
 // Fungsi untuk memuat lagu
 function loadSong(index) {
+  // Cek apakah lagu sudah diputar
+  if (playedSongs.includes(index)) {
+    // Jika sudah, pilih lagu berikutnya
+    nextSong();
+    return;
+  }
+
   const song = songs[index];
   audio.src = song.file;
   songTitle.textContent = song.title;
   artistName.textContent = song.artist;
   coverArt.style.backgroundImage = `url('${song.cover}')`;
-  backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
+
   document.title = song.title;
-  highlightCurrentSong();
-  playSong();
-}
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; // Set play icon
 
-// Fungsi untuk memulai lagu
-function playSong() {
-  audio.play();
+  // Set progress bar ke 0 saat lagu dimuat
+  progressBar.style.width = '0%';
+
+  audio.load(); // Reload audio
+  audio.play().catch(err => console.log("Error playing audio:", err)); // Coba autoplay
   isPlaying = true;
-  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-}
+  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; // Set pause icon
 
-// Fungsi untuk menghentikan lagu
-function pauseSong() {
-  audio.pause();
-  isPlaying = false;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  // Tambahkan lagu ke playedSongs setelah diputar
+  playedSongs.push(index);
 }
 
 // Fungsi playPause untuk tombol play/pause
 function playPause() {
   if (isPlaying) {
-    pauseSong();
+    audio.pause();
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    isPlaying = false;
   } else {
-    playSong();
+    audio.play();
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    isPlaying = true;
   }
 }
 
-// Fungsi untuk memilih lagu acak berikutnya yang belum diputar
+// Fungsi untuk memilih lagu berikutnya
 function nextSong() {
-  let randomIndex;
-
-  // Cari lagu yang belum diputar
+  // Pilih index lagu berikutnya yang belum diputar
   do {
-    randomIndex = Math.floor(Math.random() * songs.length);
-  } while (playedSongs.includes(randomIndex) && playedSongs.length < songs.length);
-
-  // Jika semua lagu sudah diputar, reset playedSongs
-  if (playedSongs.length === songs.length) {
-    playedSongs = [];
-  }
-
-  // Menambahkan lagu yang sedang diputar ke playedSongs
-  playedSongs.push(randomIndex);
-
-  currentIndex = randomIndex;
+    currentIndex = (currentIndex + 1) % songs.length; // Update index ke lagu berikutnya
+  } while (playedSongs.includes(currentIndex)); // Loop sampai menemukan lagu yang belum diputar
   loadSong(currentIndex);
 }
 
 // Fungsi untuk memperbarui progress bar
 function updateProgress() {
-  if (audio.duration) {
-    const progressPercent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+  const progressPercent = (audio.currentTime / audio.duration) * 100;
+  progressBar.style.width = `${progressPercent}%`;
 
-    currentTimeEl.textContent = formatTime(audio.currentTime);
-    totalDurationEl.textContent = formatTime(audio.duration);
-  }
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  totalDurationEl.textContent = formatTime(audio.duration);
 }
 
 // Fungsi format waktu dalam menit:detik
@@ -266,85 +255,20 @@ function formatTime(seconds) {
   return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// Fungsi untuk menyorot lagu yang sedang aktif
-function highlightCurrentSong() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, index) => {
-    if (index === currentIndex) {
-      item.classList.add('active-song');
-      item.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center' // Agar item aktif selalu di tengah
-      });
-    } else {
-      item.classList.remove('active-song');
-    }
-  });
-}
-
-// Fungsi untuk memuat playlist
-function loadPlaylist() {
-  playlist.innerHTML = '';
-  songs.forEach((song, index) => {
-    const div = document.createElement('div');
-    div.className = 'playlist-item';
-    div.textContent = song.title;
-    div.addEventListener('click', () => {
-      currentIndex = index;
-      loadSong(currentIndex);
-      playSong();
-    });
-    if (index === currentIndex) {
-      div.classList.add('active-song');
-    }
-    playlist.appendChild(div);
-  });
-}
-
-// Event listener untuk tombol play/pause
+// Fungsi untuk menambah event listener ke tombol play/pause
 playPauseBtn.addEventListener('click', playPause);
 
-// Event listener untuk tombol next
+// Fungsi untuk menambah event listener ke tombol next
 nextBtn.addEventListener('click', nextSong);
 
-// Event listener untuk memperbarui progress
+// Fungsi untuk memperbarui progress saat waktu lagu berubah
 audio.addEventListener('timeupdate', updateProgress);
 
-// Event listener untuk autoplay setelah lagu selesai
+// Fungsi autoplay saat lagu selesai
 audio.addEventListener('ended', nextSong);
 
-// Fungsi untuk mendukung dragging pada progress bar
-function onDragMove(event) {
-  const width = progressBarContainer.offsetWidth;
-  const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
-  const progress = Math.min(Math.max(offsetX / width, 0), 1);
-  progressBar.style.width = `${progress * 100}%`;
-  audio.currentTime = audio.duration * progress;
-}
-
-// Tambahkan event listener untuk swipe kiri
-coverArt.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-});
-
-coverArt.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  if (touchEndX < touchStartX) {
-    coverArt.style.transition = "transform 0.5s ease";
-    coverArt.style.transform = "translateX(-100%)";
-
-    // Memuat dan memulai lagu berikutnya
-    setTimeout(() => {
-      nextSong();
-      coverArt.style.transition = "transform 0.5s ease";
-      coverArt.style.transform = "translateX(0%)";
-    }, 500);
-  }
-});
-
-// Inisialisasi
+// Memuat lagu pertama pada awalnya
 loadSong(currentIndex);
-loadPlaylist();
 
 </script>
 
