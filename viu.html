@@ -314,19 +314,19 @@
   coverArt.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
     if (touchStartX - touchEndX > 30) { // Jika geser ke kiri lebih dari 30px
+      coverArt.style.transition = "transform 0.3s ease"; // Pastikan animasi berjalan
       coverArt.style.transform = "translateX(-100%)"; // Geser gambar ke kiri
       setTimeout(() => {
         nextSong(); // Pindah ke lagu berikutnya
         coverArt.style.transition = "transform 0.3s ease"; // Animasi geser
-        coverArt.style.transform = "translateX(100%)"; // Gambar datang dari kanan
-      }, 300); // Tunggu hingga animasi selesai
+        coverArt.style.transform = "translateX(0%)"; // Kembali ke tengah
+      }, 300); // Tunggu animasi selesai
     }
   });
 
-  // Muat lagu pertama
+  // Inisialisasi
   loadSong(currentIndex);
   loadPlaylist();
-
 </script>
 
 </body>
