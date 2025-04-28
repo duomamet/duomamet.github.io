@@ -79,21 +79,11 @@
     margin-top: 20px;
     border-radius: 5px;
     overflow: hidden;
-    position: relative;
     cursor: pointer;
   }
   .progress-bar {
     background-color: #1DB954;
-  }
-  .progress-time {
-    position: absolute;
-    bottom: -20px;
-    font-size: 0.8rem;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 10px;
+    height: 100%;
   }
   .playlist {
     margin-top: 30px;
@@ -125,12 +115,8 @@
 
   <div class="song-title" id="songTitle">Tekan Play</div>
 
-  <div class="progress mt-3" id="progressContainer">
+  <div class="progress mt-3" id="progressBarContainer">
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
-    <div class="progress-time">
-      <span id="currentTime">0:00</span>
-      <span id="totalTime">0:00</span>
-    </div>
   </div>
 
   <div class="controls mt-3">
@@ -165,17 +151,7 @@
   const prevBtn = document.getElementById('prevBtn');
   const progressBar = document.getElementById('progressBar');
   const playlist = document.getElementById('playlist');
-  const currentTimeElement = document.getElementById('currentTime');
-  const totalTimeElement = document.getElementById('totalTime');
-  const progressContainer = document.getElementById('progressContainer');
-
-  let isDragging = false;
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
+  const progressBarContainer = document.getElementById('progressBarContainer');
 
   function loadSong(index) {
     const song = songs[index];
@@ -185,7 +161,6 @@
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
     document.title = song.title;  // Change web title to the song title
     highlightCurrentSong();
-    audio.load();  // Ensure audio metadata is loaded
   }
 
   function playSong() {
@@ -224,9 +199,6 @@
     if (audio.duration) {
       const progressPercent = (audio.currentTime / audio.duration) * 100;
       progressBar.style.width = `${progressPercent}%`;
-
-      currentTimeElement.textContent = formatTime(audio.currentTime);
-      totalTimeElement.textContent = formatTime(audio.duration);
     }
   }
 
@@ -272,39 +244,23 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Progress Bar Events for Mouse and Touchscreen
-  function updateProgressBar(e) {
-    const progressWidth = progressContainer.offsetWidth;
-    const offsetX = e.type.startsWith('touch') ? e.touches[0].clientX : e.offsetX;
-    const progressPercent = (offsetX / progressWidth) * 100;
-    progressBar.style.width = `${progressPercent}%`;
-    audio.currentTime = (audio.duration * progressPercent) / 100;
-  }
+  // Allow dragging to change progress
+  progressBarContainer.addEventListener('mousedown', (event) => {
+    const onMouseMove = (moveEvent) => {
+      const width = progressBarContainer.offsetWidth;
+      const offsetX = moveEvent.clientX - progressBarContainer.getBoundingClientRect().left;
+      const progress = Math.min(Math.max(offsetX / width, 0), 1);
+      progressBar.style.width = `${progress * 100}%`;
+      audio.currentTime = progress * audio.duration;
+    };
 
-  progressContainer.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    updateProgressBar(e);
-  });
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
 
-  progressContainer.addEventListener('touchstart', (e) => {
-    isDragging = true;
-    updateProgressBar(e);
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) updateProgressBar(e);
-  });
-
-  document.addEventListener('touchmove', (e) => {
-    if (isDragging) updateProgressBar(e);
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-
-  document.addEventListener('touchend', () => {
-    isDragging = false;
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   });
 
   // Init (acak lagu ketika pertama kali dimuat)
