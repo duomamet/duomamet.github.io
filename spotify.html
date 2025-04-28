@@ -98,13 +98,16 @@
       max-height: 200px;
       overflow-y: auto;
     }
+
+    .playlist::-webkit-scrollbar {
+  display: none; /* Menyembunyikan scrollbar di browser berbasis Webkit */
+}
     .playlist-item {
       padding: 10px;
       border-bottom: 1px solid #333;
       cursor: pointer;
     }
-    .playlist-item:hover {
-      background-color: #2a2a2a;
+    
     }
     .active-song {
       color: #1DB954;
