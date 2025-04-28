@@ -217,11 +217,12 @@
     }
   }
 
-  function nextSong() {
-    currentIndex = (currentIndex + 1) % songs.length;
-    loadSong(currentIndex);
-    playSong();
-  }
+ function nextSong() {
+  // Mengambil index acak setiap kali lagu selesai
+  currentIndex = Math.floor(Math.random() * songs.length);
+  loadSong(currentIndex);
+  playSong();
+}
 
   function prevSong() {
     currentIndex = (currentIndex - 1 + songs.length) % songs.length;
