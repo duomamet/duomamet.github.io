@@ -1,360 +1,262 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23A9A9A9' d='M96 64h320c17.7 0 32 14.3 32 32V320c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32zm0 384h320c17.7 0 32 14.3 32 32s-14.3 32-32 32H96c-17.7 0-32-14.3-32-32s14.3-32 32-32z'/%3E%3C/svg%3E">
-    <title>eBox - Nonton Gratis</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-        body {
-            font-family: Roboto;
-            background-color: #000;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            color: white;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Radio Shuffle Pro</title>
 
-        .sidebar {
-            width: 220px;
-            background-color: #222;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-            align-items: stretch;
-            margin-right: 20px;
-        }
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
-        .sidebar.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            width: 80px;
-        }
-
-        .sidebar h2 { 
-            color: green;
-            margin-bottom: 30px;
-            font-size: 40px;
-            text-align: center;
-            text-transform: none;
-        }
-
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            text-align: left; 
-        }
-
-        .sidebar ul li {
-            margin-bottom: 15px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 20px;
-        }
-
-        .sidebar ul li.focused {
-            background-color: #3d3d3d;
-            border: 2px solid #3d3d3d;
-            padding: 4px 8px;
-        }
-
-        .sidebar ul li:last-child.focused {
-            background-color: red;
-            border: 2px solid red;
-            padding: 4px 8px;
-        }
-
-        .sidebar ul li:last-child {
-            margin-top: 40px;
-        }
-
-        .text{
-            margin-left: 5px;
-        }
-
-        .sidebar.disabled ul li .text {
-            display: none;
-        }
-
-        .sidebar.disabled ul li span {
-            font-size: 24px;
-        }
-
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            gap: 20px;
-            overflow: hidden;
-            align-items: flex-start;
-        }
-
-        .slider {
-            display: flex;
-            overflow: visible;
-            width: 90%;
-            position: relative;
-            margin-top: 20px;
-        }
-
-        .slider-track {
-            display: flex;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .slide {
-            width: 240px;
-            height: 135px;
-            margin: 0 5px;
-            background-color: #444;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            border-radius: 10px;
-            opacity: 0.5;
-            transform: scale(0.8);
-        }
-
-        .slide.active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 0.3s, transform 0.3s, border 0.3s;
-        }
-
-        .slide img {
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .slider.focused {
-            padding: 10px;
-            border-radius: 12px;
-        }
-
-        .slider:not(.focused) .slide {
-            transition: none;
-        }
-
-        .slider:not(.focused) .slide.active {
-            opacity: 0.5;
-            transform: scale(0.8);
-        }
-    </style>
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      transition: background 1s ease, background-color 0.5s;
+    }
+    .player-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 450px;
+    }
+    .btn-custom {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+    }
+    audio {
+      width: 100%;
+      margin-top: 20px;
+    }
+    #current-song {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .rotate {
+      animation: spin 4s linear infinite;
+    }
+    @keyframes spin {
+      from {transform: rotate(0deg);}
+      to {transform: rotate(360deg);}
+    }
+    .progress {
+      height: 10px;
+      margin-top: 20px;
+      background-color: rgba(255,255,255,0.3);
+    }
+    .progress-bar {
+      background-color: #ffeb3b;
+    }
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    #volume-control {
+      margin-top: 20px;
+    }
+    #time-info {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .dark-mode {
+      background-color: #121212 !important;
+      color: white;
+    }
+    .light-mode {
+      background-color: #f4f4f4 !important;
+      color: black;
+    }
+  </style>
 </head>
-<body>
-    <div class="sidebar" id="sidebar">
-        <h2><i class="fab fa-android"></i></h2>
-        <ul id="menuList">
-            <li><span class="fas fa-tv"></span><span class="text">Local</span></li>
-            <li><span class="fas fa-film"></span><span class="text">Entertainment</span></li>
-            <li><span class="fas fa-football-ball"></span><span class="text">Sports</span></li>
-            <li><span class="fas fa-book"></span><span class="text">Knowledge</span></li>
-            <li><span class="fas fa-video"></span><span class="text">Movies</span></li>
-            <li><span class="fas fa-info-circle"></span><span class="text">About</span></li>
-            <li><span class="fas fa-power-off"></span><span class="text">Exit</span></li>
-        </ul>
-    </div>
+<body class="dark-mode">
 
-    <div class="main" id="carouselContainer">
-        <div class="slider" id="sliderUnified">
-            <div class="slider-track" id="sliderTrackUnified"></div>
+<div class="player-container">
+  <h1 class="mb-4">
+    <i id="radio-icon" class="fas fa-radio fa-2x"></i><br> 
+    My Radio Shuffle Pro
+  </h1>
+
+  <button id="startButton" class="btn btn-light btn-custom">
+    <i class="fas fa-play"></i> Start Radio
+  </button>
+
+  <div id="control-buttons" class="d-none">
+    <button id="prevButton" class="btn btn-outline-light btn-custom">
+      <i class="fas fa-backward"></i>
+    </button>
+    <button id="nextButton" class="btn btn-outline-light btn-custom">
+      <i class="fas fa-forward"></i>
+    </button>
+    <button id="shuffleButton" class="btn btn-outline-warning btn-custom">
+      <i class="fas fa-random"></i>
+    </button>
+    <button id="themeButton" class="btn btn-outline-info btn-custom">
+      <i class="fas fa-adjust"></i> Mode
+    </button>
+  </div>
+
+  <audio id="player" controls class="mt-4 d-none"></audio>
+
+  <div id="current-song" class="d-none mt-3">
+    🎵 Now Playing: <span id="song-title"></span>
+  </div>
+
+  <div class="progress d-none" id="progress-container">
+    <div class="progress-bar" id="progress-bar" role="progressbar"></div>
+  </div>
+
+  <div id="time-info" class="d-none">00:00 / 00:00</div>
+
+  <div id="volume-control" class="d-none">
+    <label for="volumeSlider" class="form-label">Volume</label>
+    <input type="range" class="form-range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const songs = [
+    { src: 'lagu1.mp3', title: 'Judul Lagu 1', bg: 'linear-gradient(to right, #ff7e5f, #feb47b)' },
+    { src: 'lagu2.mp3', title: 'Judul Lagu 2', bg: 'linear-gradient(to right, #6a11cb, #2575fc)' },
+    { src: 'lagu3.mp3', title: 'Judul Lagu 3', bg: 'linear-gradient(to right, #11998e, #38ef7d)' }
+  ];
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  shuffle(songs);
+
+  let currentSong = 0;
+  const player = document.getElementById('player');
+  const startButton = document.getElementById('startButton');
+  const prevButton = document.getElementById('prevButton');
+  const nextButton = document.getElementById('nextButton');
+  const shuffleButton = document.getElementById('shuffleButton');
+  const themeButton = document.getElementById('themeButton');
+  const controlButtons = document.getElementById('control-buttons');
+  const currentSongDiv = document.getElementById('current-song');
+  const songTitleSpan = document.getElementById('song-title');
+  const radioIcon = document.getElementById('radio-icon');
+  const progressContainer = document.getElementById('progress-container');
+  const progressBar = document.getElementById('progress-bar');
+  const toastContainer = document.getElementById('toast-container');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeControl = document.getElementById('volume-control');
+  const timeInfo = document.getElementById('time-info');
+  let isDarkMode = true;
+
+  function playSong(index) {
+    player.src = songs[index].src;
+    player.play();
+    songTitleSpan.textContent = songs[index].title;
+    currentSongDiv.classList.remove('d-none');
+    progressContainer.classList.remove('d-none');
+    volumeControl.classList.remove('d-none');
+    timeInfo.classList.remove('d-none');
+    document.body.style.background = songs[index].bg;
+    showToast(`Sekarang memutar: ${songs[index].title}`);
+  }
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-bg-primary border-0 show';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">
+          ${message}
         </div>
-    </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>`;
+    toastContainer.appendChild(toast);
 
-    <script>
-        const container = document.getElementById('carouselContainer');
-        const menuItems = document.querySelectorAll('#menuList li');
-        const sidebar = document.getElementById('sidebar');
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
 
-        // Data JSON untuk slide
-        const slideData = {
-            "slides": [
-                { "src": "https://via.placeholder.com/200x120?text=1", "alt": "Slide 1" },
-                { "src": "https://via.placeholder.com/200x120?text=2", "alt": "Slide 2" },
-                { "src": "https://via.placeholder.com/200x120?text=3", "alt": "Slide 3" },
-                { "src": "https://via.placeholder.com/200x120?text=4", "alt": "Slide 4" },
-                { "src": "https://via.placeholder.com/200x120?text=5", "alt": "Slide 5" },
-                { "src": "https://via.placeholder.com/200x120?text=A", "alt": "Slide A" },
-                { "src": "https://via.placeholder.com/200x120?text=B", "alt": "Slide B" },
-                { "src": "https://via.placeholder.com/200x120?text=C", "alt": "Slide C" },
-                { "src": "https://via.placeholder.com/200x120?text=D", "alt": "Slide D" },
-                { "src": "https://via.placeholder.com/200x120?text=E", "alt": "Slide E" }
-            ]
-        };
+  function formatTime(seconds) {
+    const min = Math.floor(seconds / 60) || 0;
+    const sec = Math.floor(seconds % 60) || 0;
+    return `${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+  }
 
-        // Fungsi untuk mendistribusikan slide dari data JSON
-        function distributeSlides() {
-            const allSlides = slideData.slides;
-            const slidesPerSlider = 5;
-            container.innerHTML = ''; // Bersihkan slider yang ada
+  player.addEventListener('ended', () => {
+    currentSong = (currentSong + 1) % songs.length;
+    playSong(currentSong);
+  });
 
-            // Membagi slides menjadi beberapa slider dengan 5 slides per slider
-            for (let i = 0; i < allSlides.length; i += slidesPerSlider) {
-                const slidesChunk = allSlides.slice(i, i + slidesPerSlider);
+  startButton.addEventListener('click', () => {
+    startButton.classList.add('d-none');
+    player.classList.remove('d-none');
+    controlButtons.classList.remove('d-none');
+    radioIcon.classList.add('rotate');
+    playSong(currentSong);
+  });
 
-                // Membuat slider dengan chunk slides tersebut
-                const slider = createSlider(slidesChunk);
-            }
-        }
+  nextButton.addEventListener('click', () => {
+    currentSong = (currentSong + 1) % songs.length;
+    playSong(currentSong);
+  });
 
-        // Fungsi untuk membuat slider berdasarkan data
-        function createSlider(slides) {
-            const slider = document.createElement('div');
-            slider.classList.add('slider');
+  prevButton.addEventListener('click', () => {
+    currentSong = (currentSong - 1 + songs.length) % songs.length;
+    playSong(currentSong);
+  });
 
-            const sliderTrack = document.createElement('div');
-            sliderTrack.classList.add('slider-track');
+  shuffleButton.addEventListener('click', () => {
+    shuffle(songs);
+    currentSong = 0;
+    playSong(currentSong);
+    showToast('Playlist diacak!');
+  });
 
-            slides.forEach(slideData => {
-                const slide = document.createElement('div');
-                slide.classList.add('slide');
-                slide.innerHTML = `<img src="${slideData.src}" alt="${slideData.alt}">`;
-                sliderTrack.appendChild(slide);
-            });
+  themeButton.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    if (isDarkMode) {
+      document.body.classList.remove('light-mode');
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+    }
+  });
 
-            slider.appendChild(sliderTrack);
-            container.appendChild(slider);
-        }
+  player.addEventListener('timeupdate', () => {
+    if (player.duration) {
+      const percent = (player.currentTime / player.duration) * 100;
+      progressBar.style.width = percent + '%';
+      timeInfo.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
+    }
+  });
 
-        // Panggil fungsi distributeSlides untuk mendistribusikan slide
-        distributeSlides();
-    </script>
- <script>
-        const container = document.getElementById('carouselContainer');
-        const menuItems = document.querySelectorAll('#menuList li');
-        const sidebar = document.getElementById('sidebar');
+  volumeSlider.addEventListener('input', () => {
+    player.volume = volumeSlider.value;
+  });
+</script>
 
-        let currentSliderIndex = 0;
-        let currentMenuIndex = 0;
-        let currentIndices = [];
-        let sidebarActive = true;
-
-        function createSlider(slides) {
-            const slider = document.createElement('div');
-            slider.classList.add('slider');
-
-            const sliderTrack = document.createElement('div');
-            sliderTrack.classList.add('slider-track');
-
-            slides.forEach(slide => sliderTrack.appendChild(slide));
-            slider.appendChild(sliderTrack);
-
-            container.appendChild(slider);
-            currentIndices.push(0);
-            return slider;
-        }
-
-        function distributeSlides() {
-            const allSlides = Array.from(document.querySelectorAll('.slide'));
-            const slidesPerSlider = 5;
-            container.innerHTML = ''; // Clear existing sliders
-
-            for (let i = 0; i < allSlides.length; i += slidesPerSlider) {
-                const slidesChunk = allSlides.slice(i, i + slidesPerSlider);
-                createSlider(slidesChunk);
-            }
-        }
-
-        function updateSlider(sliderIndex) {
-            const sliders = document.querySelectorAll('.slider');
-            const sliderTrack = sliders[sliderIndex].querySelector('.slider-track');
-            const slides = sliders[sliderIndex].querySelectorAll('.slide');
-            const currentIndex = currentIndices[sliderIndex];
-            const offset = -currentIndex * (slides[0].offsetWidth + 10);
-
-            sliderTrack.style.transform = `translateX(${offset}px)`;
-
-            slides.forEach((slide, index) => {
-                if (index === currentIndex && sliders[sliderIndex].classList.contains('focused')) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
-            });
-        }
-
-        function moveSlider(sliderIndex, direction) {
-            const sliders = document.querySelectorAll('.slider');
-            const slides = sliders[sliderIndex].querySelectorAll('.slide');
-            currentIndices[sliderIndex] = (currentIndices[sliderIndex] + direction + slides.length) % slides.length;
-            updateSlider(sliderIndex);
-        }
-
-        function focusSlider(index) {
-            const sliders = document.querySelectorAll('.slider');
-            sliders[currentSliderIndex].classList.remove('focused');
-            updateSlider(currentSliderIndex);
-
-            currentSliderIndex = index;
-            sliders[currentSliderIndex].classList.add('focused');
-            updateSlider(currentSliderIndex);
-        }
-
-        function updateMenuFocus() {
-            menuItems.forEach((item, index) => {
-                if (index === currentMenuIndex) {
-                    item.classList.add('focused');
-                } else {
-                    item.classList.remove('focused');
-                }
-            });
-        }
-
-        function toggleSidebar(active) {
-            sidebarActive = active;
-            sidebar.classList.toggle('disabled', !active);
-
-            if (active) {
-                currentMenuIndex = 0;
-                updateMenuFocus();
-            }
-        }
-
-        document.addEventListener('keydown', (event) => {
-            const sliders = document.querySelectorAll('.slider');
-
-            if (sidebarActive) {
-                if (event.key === 'ArrowDown') {
-                    currentMenuIndex = (currentMenuIndex + 1) % menuItems.length;
-                    updateMenuFocus();
-                } else if (event.key === 'ArrowUp') {
-                    currentMenuIndex = (currentMenuIndex - 1 + menuItems.length) % menuItems.length;
-                    updateMenuFocus();
-                } else if (event.key === 'ArrowRight') {
-                    toggleSidebar(false);
-                    focusSlider(currentSliderIndex);
-                }
-            } else {
-                if (event.key === 'ArrowRight') {
-                    moveSlider(currentSliderIndex, 1);
-                } else if (event.key === 'ArrowLeft') {
-                    moveSlider(currentSliderIndex, -1);
-                } else if (event.key === 'ArrowDown') {
-                    focusSlider((currentSliderIndex + 1) % sliders.length);
-                } else if (event.key === 'ArrowUp') {
-                    focusSlider((currentSliderIndex - 1 + sliders.length) % sliders.length);
-                } else if (event.key === 'Escape' || event.key === 'Backspace') {
-                    toggleSidebar(true);
-                }
-            }
-        });
-
-        distributeSlides();
-        updateSlider(0);
-        updateMenuFocus();
-
-    </script>
 </body>
 </html>
