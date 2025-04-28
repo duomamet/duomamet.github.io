@@ -103,10 +103,10 @@
       color: #1DB954;
       font-weight: bold;
     }
-    /* Posisi untuk current time */
+    /* Styling untuk current time */
     .current-time {
       position: absolute;
-      bottom: -25px;  /* Memberikan jarak lebih dari progress bar */
+      bottom: -20px;  /* Penempatan tepat di bawah progress bar */
       left: 0;
       font-size: 0.9rem;
       color: #fff;
@@ -126,7 +126,8 @@
 
   <div class="progress mt-3" id="progressBarContainer">
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
-    <span id="currentTime" class="current-time">0:00</span>  <!-- Memastikan elemen waktu berada di bawah progress bar -->
+    <!-- Elemen untuk waktu yang sedang berjalan -->
+    <span id="currentTime" class="current-time">0:00</span> 
   </div>
 
   <div class="controls mt-3">
@@ -162,6 +163,7 @@
   const progressBar = document.getElementById('progressBar');
   const playlist = document.getElementById('playlist');
   const progressBarContainer = document.getElementById('progressBarContainer');
+  const currentTimeElement = document.getElementById('currentTime'); // Ambil elemen currentTime
 
   function loadSong(index) {
     const song = songs[index];
@@ -213,7 +215,7 @@
       // Menampilkan waktu yang sedang diputar
       const minutes = Math.floor(audio.currentTime / 60);
       const seconds = Math.floor(audio.currentTime % 60);
-      document.getElementById('currentTime').textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+      currentTimeElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
     }
   }
 
@@ -259,34 +261,6 @@
 
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
-
-  // Allow dragging to change progress (Mouse and Touch)
-  function onDragMove(event) {
-    const width = progressBarContainer.offsetWidth;
-    const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
-    const progress = Math.min(Math.max(offsetX / width, 0), 1);
-    progressBar.style.width = `${progress * 100}%`;
-    audio.currentTime = progress * audio.duration;
-  }
-
-  function onDragEnd() {
-    document.removeEventListener('mousemove', onDragMove);
-    document.removeEventListener('mouseup', onDragEnd);
-    document.removeEventListener('touchmove', onDragMove);
-    document.removeEventListener('touchend', onDragEnd);
-  }
-
-  // Mouse Events
-  progressBarContainer.addEventListener('mousedown', (event) => {
-    document.addEventListener('mousemove', onDragMove);
-    document.addEventListener('mouseup', onDragEnd);
-  });
-
-  // Touch Events
-  progressBarContainer.addEventListener('touchstart', (event) => {
-    document.addEventListener('touchmove', onDragMove);
-    document.addEventListener('touchend', onDragEnd);
-  });
 
   // Init (acak lagu ketika pertama kali dimuat)
   currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak
