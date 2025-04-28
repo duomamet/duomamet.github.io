@@ -84,6 +84,14 @@
       background-color: #1DB954;
       height: 100%;
     }
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #fff;
+      padding: 0 5px;
+    }
     .playlist {
       margin-top: 30px;
       text-align: left;
@@ -102,18 +110,9 @@
       color: #1DB954;
       font-weight: bold;
     }
-    /* Styling untuk current time */
-    .current-time {
-      font-size: 0.9rem;
-  color: #fff;
-  padding-left: 5px;
-  margin-top: 5px;
-  text-align: left; /* Tambahkan ini supaya teks rata kiri */
-  width: 100%; /* Pastikan lebar penuh supaya align kiri bekerja */
-    }
   </style>
-
 </head>
+
 <body>
 
 <div class="background-blur" id="backgroundBlur"></div>
@@ -127,7 +126,11 @@
     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
   </div>
 
-  <div id="currentTime" class="current-time">0:00</div> <!-- Waktu ditampilkan di bawah progress bar -->
+  <!-- Tambahan bagian waktu -->
+  <div class="time-info">
+    <span id="currentTime">0:00</span>
+    <span id="totalDuration">0:00</span>
+  </div>
 
   <div class="controls mt-3">
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
@@ -162,7 +165,8 @@
   const progressBar = document.getElementById('progressBar');
   const playlist = document.getElementById('playlist');
   const progressBarContainer = document.getElementById('progressBarContainer');
-  const currentTimeElement = document.getElementById('currentTime'); // Ambil elemen currentTime
+  const currentTimeEl = document.getElementById('currentTime');
+  const totalDurationEl = document.getElementById('totalDuration');
 
   function loadSong(index) {
     const song = songs[index];
@@ -170,7 +174,7 @@
     songTitle.textContent = song.title;
     coverArt.style.backgroundImage = `url('${song.cover}')`;
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-    document.title = song.title;  // Change web title to the song title
+    document.title = song.title;
     highlightCurrentSong();
   }
 
@@ -211,15 +215,15 @@
       const progressPercent = (audio.currentTime / audio.duration) * 100;
       progressBar.style.width = `${progressPercent}%`;
 
-      // Debugging: Cek nilai durasi dan waktu yang sedang diputar
-      console.log("Audio Duration:", audio.duration);
-      console.log("Audio Current Time:", audio.currentTime);
-
-      // Menampilkan waktu yang sedang diputar
-      const minutes = Math.floor(audio.currentTime / 60);
-      const seconds = Math.floor(audio.currentTime % 60);
-      currentTimeElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+      totalDurationEl.textContent = formatTime(audio.duration);
     }
+  }
+
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
   }
 
   function highlightCurrentSong() {
@@ -234,26 +238,19 @@
   }
 
   function loadPlaylist() {
-    playlist.innerHTML = ''; // Clear previous playlist
-
-    // Loop through songs and create playlist items
+    playlist.innerHTML = '';
     songs.forEach((song, index) => {
       const div = document.createElement('div');
       div.className = 'playlist-item';
       div.textContent = song.title;
-      
-      // Add event listener to each song item in the playlist
       div.addEventListener('click', () => {
         currentIndex = index;
         loadSong(currentIndex);
         playSong();
       });
-
-      // Highlight the currently playing song
       if (index === currentIndex) {
         div.classList.add('active-song');
       }
-
       playlist.appendChild(div);
     });
   }
@@ -265,8 +262,34 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('ended', nextSong);
 
-  // Init (acak lagu ketika pertama kali dimuat)
-  currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak
+  // Allow dragging progress
+  function onDragMove(event) {
+    const width = progressBarContainer.offsetWidth;
+    const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
+    const progress = Math.min(Math.max(offsetX / width, 0), 1);
+    progressBar.style.width = `${progress * 100}%`;
+    audio.currentTime = progress * audio.duration;
+  }
+
+  function onDragEnd() {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+  }
+
+  progressBarContainer.addEventListener('mousedown', () => {
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+  });
+
+  progressBarContainer.addEventListener('touchstart', () => {
+    document.addEventListener('touchmove', onDragMove);
+    document.addEventListener('touchend', onDragEnd);
+  });
+
+  // Init random
+  currentIndex = Math.floor(Math.random() * songs.length);
   loadSong(currentIndex);
   playSong();
   loadPlaylist();
