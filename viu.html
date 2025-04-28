@@ -71,9 +71,11 @@
       color: #fff;
       font-size: 1.8rem;
       margin: 0 10px;
+      transition: transform 0.3s ease;
     }
     .controls button:hover {
       color: #1DB954;
+      transform: scale(1.2);
     }
     .progress {
       height: 5px;
@@ -119,7 +121,7 @@
     <div class="song-title" id="songTitle">Tekan Play</div>
   </div>
 
-  <div class="controls">
+  <div class="controls mt-3">
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
@@ -132,9 +134,7 @@
 
   <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
 
-  <div class="playlist" id="playlist">
-    <!-- List lagu muncul di sini -->
-  </div>
+  <div class="playlist" id="playlist"></div>
 
   <audio id="audioPlayer" class="d-none"></audio>
 </div>
