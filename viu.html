@@ -314,11 +314,12 @@
   coverArt.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
     if (touchStartX - touchEndX > 30) { // Jika geser ke kiri lebih dari 30px
-      nextSong(); // Pindah ke lagu berikutnya
-      coverArt.style.transform = "translateX(-100%)"; // Geser gambar
+      coverArt.style.transform = "translateX(-100%)"; // Geser gambar ke kiri
       setTimeout(() => {
-        coverArt.style.transform = "translateX(0)"; // Kembalikan gambar ke posisi semula
-      }, 300);
+        nextSong(); // Pindah ke lagu berikutnya
+        coverArt.style.transition = "transform 0.3s ease"; // Animasi geser
+        coverArt.style.transform = "translateX(100%)"; // Gambar datang dari kanan
+      }, 300); // Tunggu hingga animasi selesai
     }
   });
 
