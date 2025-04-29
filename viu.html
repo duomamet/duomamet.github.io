@@ -125,6 +125,13 @@
       color: #1DB954;
       font-weight: bold;
     }
+    #shuffleBtn {
+      font-size: 18px;
+      color: white;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -151,6 +158,7 @@
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
+    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
   </div>
 
   <div class="playlist" id="playlist"></div>
@@ -176,8 +184,8 @@ const songs = [
 
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
-let history = [];
-
+let isShuffle = false;
+const history = [];
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
@@ -186,11 +194,19 @@ const backgroundBlur = document.getElementById('backgroundBlur');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
 const progressBar = document.getElementById('progressBar');
 const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
+let touchStartX = 0;
+let touchEndX = 0;
+
+shuffleBtn.addEventListener('click', () => {
+  isShuffle = !isShuffle;
+  shuffleBtn.style.color = isShuffle ? 'gold' : 'white';
+});
 
 function loadSong(index) {
   const song = songs[index];
@@ -203,6 +219,7 @@ function loadSong(index) {
   highlightCurrentSong();
   playSong();
 
+  // Media Session API
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.title,
@@ -213,7 +230,9 @@ function loadSong(index) {
 
     navigator.mediaSession.setActionHandler("play", playSong);
     navigator.mediaSession.setActionHandler("pause", pauseSong);
-    navigator.mediaSession.setActionHandler("previoustrack", prevSong);
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      prevSong();
+    });
     navigator.mediaSession.setActionHandler("nexttrack", nextSong);
   }
 }
@@ -236,7 +255,15 @@ function playPause() {
 
 function nextSong() {
   history.push(currentIndex);
-  currentIndex = Math.floor(Math.random() * songs.length);
+  if (isShuffle) {
+    let nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * songs.length);
+    } while (nextIndex === currentIndex && songs.length > 1); 
+    currentIndex = nextIndex;
+  } else {
+    currentIndex = (currentIndex + 1) % songs.length;
+  }
   loadSong(currentIndex);
 }
 
@@ -270,59 +297,32 @@ function highlightCurrentSong() {
   items.forEach((item, index) => {
     item.classList.toggle('active-song', index === currentIndex);
     if (index === currentIndex) {
-      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      item.scrollIntoView({ block: 'nearest' });
     }
   });
 }
 
-function loadPlaylist() {
-  playlist.innerHTML = '';
-  songs.forEach((song, index) => {
-    const div = document.createElement('div');
-    div.className = 'playlist-item';
-    div.textContent = song.title;
-    div.addEventListener('click', () => {
-      history.push(currentIndex);
-      currentIndex = index;
-      loadSong(currentIndex);
-    });
-    if (index === currentIndex) {
-      div.classList.add('active-song');
-    }
-    playlist.appendChild(div);
+// Create Playlist
+songs.forEach((song, index) => {
+  const songElement = document.createElement('div');
+  songElement.classList.add('playlist-item');
+  songElement.textContent = song.title;
+  songElement.addEventListener('click', () => {
+    currentIndex = index;
+    loadSong(currentIndex);
   });
-  highlightCurrentSong();
-}
+  playlist.appendChild(songElement);
+});
 
 playPauseBtn.addEventListener('click', playPause);
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
+
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', nextSong);
 
-coverArt.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-});
-coverArt.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  if (touchEndX < touchStartX) {
-    coverArt.style.transition = "transform 0.5s ease";
-    coverArt.style.transform = "translateX(-100%)";
-    setTimeout(() => {
-      nextSong();
-      coverArt.style.transform = "translateX(0%)";
-    }, 500);
-  }
-});
-
-let touchStartX = 0;
-let touchEndX = 0;
-
 loadSong(currentIndex);
-loadPlaylist();
+
 </script>
-
-
-
 </body>
 </html>
