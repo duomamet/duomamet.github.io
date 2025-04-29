@@ -12,7 +12,6 @@
 
   <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" type="image/svg+xml">
 
-
   <style>
     body {
       margin: 0;
@@ -151,6 +150,7 @@
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
+    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
   </div>
 
   <div class="playlist" id="playlist"></div>
@@ -176,6 +176,7 @@ const songs = [
 
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
+let isShuffle = false;
 let history = [];
 
 const audio = document.getElementById('audioPlayer');
@@ -186,6 +187,7 @@ const backgroundBlur = document.getElementById('backgroundBlur');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
 const progressBar = document.getElementById('progressBar');
 const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
@@ -202,20 +204,6 @@ function loadSong(index) {
   document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
-
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.artist,
-      album: "Spotify Premium",
-      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
-    });
-
-    navigator.mediaSession.setActionHandler("play", playSong);
-    navigator.mediaSession.setActionHandler("pause", pauseSong);
-    navigator.mediaSession.setActionHandler("previoustrack", prevSong);
-    navigator.mediaSession.setActionHandler("nexttrack", nextSong);
-  }
 }
 
 function playSong() {
@@ -235,8 +223,12 @@ function playPause() {
 }
 
 function nextSong() {
-  history.push(currentIndex);
-  currentIndex = Math.floor(Math.random() * songs.length);
+  if (isShuffle) {
+    history.push(currentIndex);
+    currentIndex = Math.floor(Math.random() * songs.length);
+  } else {
+    currentIndex = (currentIndex + 1) % songs.length;
+  }
   loadSong(currentIndex);
 }
 
@@ -294,35 +286,20 @@ function loadPlaylist() {
   highlightCurrentSong();
 }
 
+shuffleBtn.addEventListener('click', () => {
+  isShuffle = !isShuffle;
+  shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
+});
+
 playPauseBtn.addEventListener('click', playPause);
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', nextSong);
 
-coverArt.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-});
-coverArt.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  if (touchEndX < touchStartX) {
-    coverArt.style.transition = "transform 0.5s ease";
-    coverArt.style.transform = "translateX(-100%)";
-    setTimeout(() => {
-      nextSong();
-      coverArt.style.transform = "translateX(0%)";
-    }, 500);
-  }
-});
-
-let touchStartX = 0;
-let touchEndX = 0;
-
 loadSong(currentIndex);
 loadPlaylist();
 </script>
-
-
 
 </body>
 </html>
