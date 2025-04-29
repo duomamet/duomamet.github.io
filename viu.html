@@ -205,6 +205,7 @@ const songs = [
 ];
 
 let currentIndex = Math.floor(Math.random() * songs.length);
+let previousIndex = null;  // Variabel untuk menyimpan indeks lagu sebelumnya
 let isPlaying = false;
 let isShuffle = false;  // Mengaktifkan shuffle
 
@@ -222,8 +223,6 @@ const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
-let touchStartX = 0;
-let touchEndX = 0;
 
 function loadSong(index) {
   const song = songs[index];
@@ -235,6 +234,10 @@ function loadSong(index) {
   document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
+  
+  // Simpan indeks lagu yang sedang diputar
+  previousIndex = currentIndex;
+  currentIndex = index;  // Update currentIndex ke lagu yang baru diputar
 }
 
 function playSong() {
@@ -263,8 +266,13 @@ function nextSong() {
 }
 
 function prevSong() {
-  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-  loadSong(currentIndex);
+  if (previousIndex !== null) {
+    // Jika ada lagu sebelumnya, putar lagu tersebut
+    loadSong(previousIndex);
+  } else {
+    // Jika tidak ada lagu sebelumnya, ulangi lagu yang sedang diputar
+    loadSong(currentIndex);
+  }
 }
 
 function toggleShuffle() {
