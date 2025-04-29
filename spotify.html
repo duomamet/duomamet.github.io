@@ -54,7 +54,7 @@
       border-radius: 20px;
       position: relative;
       overflow: hidden;
-      transition: transform 0.5s ease; /* Memperpanjang durasi transisi */
+      transition: transform 0.5s ease;
     }
     .song-title {
       margin-top: 10px;
@@ -107,8 +107,9 @@
     }
 
     .playlist::-webkit-scrollbar {
-  display: none; /* Menyembunyikan scrollbar di browser berbasis Webkit */
-}
+      display: none;
+    }
+
     .playlist-item {
       padding: 10px;
       border-bottom: 1px solid #333;
@@ -171,7 +172,7 @@ const songs = [
   { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
 ];
 
-let currentIndex = Math.floor(Math.random() * songs.length); // Pilih lagu acak pertama
+let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
@@ -180,7 +181,6 @@ const coverArt = document.getElementById('coverArt');
 const backgroundBlur = document.getElementById('backgroundBlur');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
 const progressBar = document.getElementById('progressBar');
 const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
@@ -190,154 +190,102 @@ const totalDurationEl = document.getElementById('totalDuration');
 let touchStartX = 0;
 let touchEndX = 0;
 
-// Fungsi untuk memuat lagu
 function loadSong(index) {
   const song = songs[index];
   audio.src = song.file;
   songTitle.textContent = song.title;
-  artistName.textContent = song.artist;  // Menampilkan nama artis
+  artistName.textContent = song.artist;
   coverArt.style.backgroundImage = `url('${song.cover}')`;
   backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-  document.title = song.title;
+  document.title = `${song.title} - ${song.artist}`; // <- Ubah di sini
   highlightCurrentSong();
-  playSong(); // Menambahkan pemutaran otomatis saat lagu dimuat
+  playSong();
 }
 
-// Fungsi untuk memulai lagu
 function playSong() {
   audio.play();
   isPlaying = true;
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 }
 
-// Fungsi untuk menghentikan lagu
 function pauseSong() {
   audio.pause();
   isPlaying = false;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
 
-// Fungsi playPause untuk tombol play/pause
 function playPause() {
-  if (isPlaying) {
-    pauseSong();
-  } else {
-    playSong();
-  }
+  isPlaying ? pauseSong() : playSong();
 }
 
-// Fungsi untuk lagu berikutnya (acak)
 function nextSong() {
   currentIndex = Math.floor(Math.random() * songs.length);
   loadSong(currentIndex);
 }
 
-// Fungsi untuk memperbarui progress bar
 function updateProgress() {
   if (audio.duration) {
     const progressPercent = (audio.currentTime / audio.duration) * 100;
     progressBar.style.width = `${progressPercent}%`;
-
     currentTimeEl.textContent = formatTime(audio.currentTime);
     totalDurationEl.textContent = formatTime(audio.duration);
   }
 }
 
-// Fungsi format waktu dalam menit:detik
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// Fungsi untuk menyorot lagu yang sedang aktif
 function highlightCurrentSong() {
   const items = document.querySelectorAll('.playlist-item');
   items.forEach((item, index) => {
+    item.classList.toggle('active-song', index === currentIndex);
     if (index === currentIndex) {
-      item.classList.add('active-song');
-      item.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center' // Agar item aktif selalu di tengah
-      });
-    } else {
-      item.classList.remove('active-song');
+      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   });
 }
 
-// Fungsi untuk memuat playlist dan menyorot lagu yang sedang aktif
 function loadPlaylist() {
-  playlist.innerHTML = ''; // Kosongkan playlist
+  playlist.innerHTML = '';
   songs.forEach((song, index) => {
     const div = document.createElement('div');
     div.className = 'playlist-item';
     div.textContent = song.title;
-    
-    // Tambahkan event listener untuk klik pada lagu di playlist
     div.addEventListener('click', () => {
       currentIndex = index;
       loadSong(currentIndex);
     });
-
-    // Menambahkan kelas aktif jika ini adalah lagu yang sedang diputar
-    if (index === currentIndex) {
-      div.classList.add('active-song');
-    }
-
-    // Menambahkan elemen ke dalam playlist
+    if (index === currentIndex) div.classList.add('active-song');
     playlist.appendChild(div);
   });
-
-  // Panggil highlightCurrentSong() setelah playlist dimuat
   highlightCurrentSong();
 }
 
-// Event listener untuk tombol play/pause
 playPauseBtn.addEventListener('click', playPause);
-
-// Event listener untuk tombol next
 nextBtn.addEventListener('click', nextSong);
-
-// Event listener untuk memperbarui progress
 audio.addEventListener('timeupdate', updateProgress);
-
-// Event listener untuk autoplay setelah lagu selesai
 audio.addEventListener('ended', nextSong);
 
-// Fungsi untuk mendukung dragging pada progress bar
-function onDragMove(event) {
-  const width = progressBarContainer.offsetWidth;
-  const offsetX = (event.clientX || event.touches[0].clientX) - progressBarContainer.getBoundingClientRect().left;
-  const progress = Math.min(Math.max(offsetX / width, 0), 1);
-  progressBar.style.width = `${progress * 100}%`;
-  audio.currentTime = audio.duration * progress;
-}
-
-// Tambahkan event listener untuk swipe kiri
 coverArt.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
 });
-
 coverArt.addEventListener('touchend', (e) => {
   touchEndX = e.changedTouches[0].screenX;
   if (touchEndX < touchStartX) {
     coverArt.style.transition = "transform 0.5s ease";
     coverArt.style.transform = "translateX(-100%)";
-    
-    // Memuat dan memulai lagu berikutnya
     setTimeout(() => {
       nextSong();
-      coverArt.style.transition = "transform 0.5s ease";
       coverArt.style.transform = "translateX(0%)";
     }, 500);
   }
 });
 
-// Inisialisasi
 loadSong(currentIndex);
 loadPlaylist();
-
 </script>
 
 </body>
