@@ -194,6 +194,25 @@ const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
+// Function to show notification with song cover
+function showNotification() {
+  if (Notification.permission === 'granted') {
+    const options = {
+      body: `Playing: ${songs[currentIndex].title} by ${songs[currentIndex].artist}`,
+      icon: songs[currentIndex].cover, // Using the song cover as the icon
+      image: songs[currentIndex].cover, // Optional: Adding larger image
+      tag: 'music-player', // Ensure only one notification is active
+    };
+    new Notification('Now Playing', options);
+  }
+}
+
+// Request permission for notifications
+if (Notification.permission !== 'granted') {
+  Notification.requestPermission();
+}
+
+// Load song and show notification
 function loadSong(index) {
   const song = songs[index];
   audio.src = song.file;
@@ -204,6 +223,7 @@ function loadSong(index) {
   document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
+  showNotification(); // Show notification with song cover
 }
 
 function playSong() {
