@@ -12,7 +12,6 @@
 
   <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" type="image/svg+xml">
 
-
   <style>
     body {
       margin: 0;
@@ -26,6 +25,7 @@
       overflow: hidden;
       font-family: 'Poppins', sans-serif;
     }
+
     .background-blur {
       position: fixed;
       top: 0; left: 0;
@@ -37,6 +37,7 @@
       z-index: -1;
       opacity: 0.5;
     }
+
     .player-card {
       position: fixed;
       background-color: rgba(0, 0, 0, 0.6);
@@ -49,6 +50,7 @@
       backdrop-filter: blur(10px);
       font-family: 'Poppins', sans-serif;
     }
+
     .song-cover {
       width: 100%;
       height: 300px;
@@ -59,17 +61,20 @@
       overflow: hidden;
       transition: transform 0.5s ease;
     }
+
     .song-title {
       margin-top: 10px;
       font-size: 1.2rem;
       font-weight: 600;
       text-align: center;
     }
+
     .artist-name {
       font-size: 0.9rem;
       color: #aaa;
       margin-top: 5px;
     }
+
     .controls button {
       background: none;
       border: none;
@@ -77,11 +82,30 @@
       font-size: 1.8rem;
       margin: 0 10px;
       transition: transform 0.3s ease;
+      display: inline-block;
+      cursor: pointer;
     }
+
     .controls button:active {
       transform: scale(1);
       color: #1DB954;
     }
+
+    #shuffleBtn {
+      font-size: 1.8rem; /* Ukuran sama dengan tombol kontrol lainnya */
+      color: white;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+
     .progress {
       height: 5px;
       background: #555;
@@ -90,10 +114,12 @@
       overflow: hidden;
       cursor: pointer;
     }
+
     .progress-bar {
       background-color: #1DB954;
       height: 100%;
     }
+
     .time-info {
       display: flex;
       justify-content: space-between;
@@ -102,6 +128,7 @@
       color: #fff;
       padding: 0 5px;
     }
+
     .playlist {
       margin-top: 30px;
       text-align: left;
@@ -118,19 +145,14 @@
       border-bottom: 1px solid #333;
       cursor: pointer;
     }
+
     .playlist-item:hover {
       background-color: #2a2a2a;
     }
+
     .active-song {
       color: #1DB954;
       font-weight: bold;
-    }
-    #shuffleBtn {
-      font-size: 18px;
-      color: white;
-      background: transparent;
-      border: none;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -158,7 +180,7 @@
     <button id="prevBtn"><i class="fas fa-backward"></i></button>
     <button id="playPauseBtn"><i class="fas fa-play"></i></button>
     <button id="nextBtn"><i class="fas fa-forward"></i></button>
-    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
+    <button id="shuffleBtn"><i class="fas fa-random"></i></button> <!-- Shuffle button -->
   </div>
 
   <div class="playlist" id="playlist"></div>
@@ -184,8 +206,8 @@ const songs = [
 
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
-let isShuffle = false;
-const history = [];
+let isShuffle = false;  // Mengaktifkan shuffle
+
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
@@ -203,11 +225,6 @@ const totalDurationEl = document.getElementById('totalDuration');
 let touchStartX = 0;
 let touchEndX = 0;
 
-shuffleBtn.addEventListener('click', () => {
-  isShuffle = !isShuffle;
-  shuffleBtn.style.color = isShuffle ? 'gold' : 'white';
-});
-
 function loadSong(index) {
   const song = songs[index];
   audio.src = song.file;
@@ -218,23 +235,6 @@ function loadSong(index) {
   document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
-
-  // Media Session API
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.artist,
-      album: "Spotify Premium",
-      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
-    });
-
-    navigator.mediaSession.setActionHandler("play", playSong);
-    navigator.mediaSession.setActionHandler("pause", pauseSong);
-    navigator.mediaSession.setActionHandler("previoustrack", () => {
-      prevSong();
-    });
-    navigator.mediaSession.setActionHandler("nexttrack", nextSong);
-  }
 }
 
 function playSong() {
@@ -254,13 +254,8 @@ function playPause() {
 }
 
 function nextSong() {
-  history.push(currentIndex);
   if (isShuffle) {
-    let nextIndex;
-    do {
-      nextIndex = Math.floor(Math.random() * songs.length);
-    } while (nextIndex === currentIndex && songs.length > 1); 
-    currentIndex = nextIndex;
+    currentIndex = Math.floor(Math.random() * songs.length);
   } else {
     currentIndex = (currentIndex + 1) % songs.length;
   }
@@ -268,60 +263,68 @@ function nextSong() {
 }
 
 function prevSong() {
-  if (history.length > 0) {
-    currentIndex = history.pop();
-    loadSong(currentIndex);
-  } else {
-    audio.currentTime = 0;
-    if (!isPlaying) playSong();
-  }
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  loadSong(currentIndex);
 }
 
-function updateProgress() {
-  if (audio.duration) {
-    const progressPercent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = `${progressPercent}%`;
-    currentTimeEl.textContent = formatTime(audio.currentTime);
-    totalDurationEl.textContent = formatTime(audio.duration);
-  }
+function toggleShuffle() {
+  isShuffle = !isShuffle;
+  shuffleBtn.style.color = isShuffle ? '#1DB954' : 'white';
 }
 
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+function updateProgressBar() {
+  const { currentTime, duration } = audio;
+  const progress = (currentTime / duration) * 100;
+  progressBar.style.width = `${progress}%`;
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  currentTimeEl.textContent = formatTime(currentTime);
+  totalDurationEl.textContent = formatTime(duration);
 }
 
 function highlightCurrentSong() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, index) => {
-    item.classList.toggle('active-song', index === currentIndex);
-    if (index === currentIndex) {
-      item.scrollIntoView({ block: 'nearest' });
+  const items = playlist.getElementsByClassName('playlist-item');
+  for (let item of items) {
+    if (item.textContent === songs[currentIndex].title) {
+      item.classList.add('active-song');
+    } else {
+      item.classList.remove('active-song');
     }
+  }
+}
+
+function populatePlaylist() {
+  playlist.innerHTML = '';
+  songs.forEach((song, index) => {
+    const songItem = document.createElement('div');
+    songItem.classList.add('playlist-item');
+    songItem.textContent = song.title;
+    songItem.onclick = () => loadSong(index);
+    playlist.appendChild(songItem);
   });
 }
 
-// Create Playlist
-songs.forEach((song, index) => {
-  const songElement = document.createElement('div');
-  songElement.classList.add('playlist-item');
-  songElement.textContent = song.title;
-  songElement.addEventListener('click', () => {
-    currentIndex = index;
-    loadSong(currentIndex);
-  });
-  playlist.appendChild(songElement);
-});
+populatePlaylist();
+loadSong(currentIndex);
+
+audio.addEventListener('timeupdate', updateProgressBar);
 
 playPauseBtn.addEventListener('click', playPause);
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
+shuffleBtn.addEventListener('click', toggleShuffle);
 
-audio.addEventListener('timeupdate', updateProgress);
-audio.addEventListener('ended', nextSong);
-
-loadSong(currentIndex);
+progressBarContainer.addEventListener('click', (e) => {
+  const { width } = progressBarContainer.getBoundingClientRect();
+  const clickPosition = e.offsetX;
+  const newTime = (clickPosition / width) * audio.duration;
+  audio.currentTime = newTime;
+});
 
 </script>
 </body>
