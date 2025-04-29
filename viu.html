@@ -176,6 +176,8 @@ const songs = [
 
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
+let history = [];
+
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
@@ -189,8 +191,6 @@ const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
-let touchStartX = 0;
-let touchEndX = 0;
 
 function loadSong(index) {
   const song = songs[index];
@@ -203,7 +203,6 @@ function loadSong(index) {
   highlightCurrentSong();
   playSong();
 
-  // Media Session API
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.title,
@@ -214,10 +213,7 @@ function loadSong(index) {
 
     navigator.mediaSession.setActionHandler("play", playSong);
     navigator.mediaSession.setActionHandler("pause", pauseSong);
-    navigator.mediaSession.setActionHandler("previoustrack", () => {
-      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-      loadSong(currentIndex);
-    });
+    navigator.mediaSession.setActionHandler("previoustrack", prevSong);
     navigator.mediaSession.setActionHandler("nexttrack", nextSong);
   }
 }
@@ -239,8 +235,19 @@ function playPause() {
 }
 
 function nextSong() {
+  history.push(currentIndex);
   currentIndex = Math.floor(Math.random() * songs.length);
   loadSong(currentIndex);
+}
+
+function prevSong() {
+  if (history.length > 0) {
+    currentIndex = history.pop();
+    loadSong(currentIndex);
+  } else {
+    audio.currentTime = 0;
+    if (!isPlaying) playSong();
+  }
 }
 
 function updateProgress() {
@@ -275,6 +282,7 @@ function loadPlaylist() {
     div.className = 'playlist-item';
     div.textContent = song.title;
     div.addEventListener('click', () => {
+      history.push(currentIndex);
       currentIndex = index;
       loadSong(currentIndex);
     });
@@ -288,13 +296,13 @@ function loadPlaylist() {
 
 playPauseBtn.addEventListener('click', playPause);
 nextBtn.addEventListener('click', nextSong);
+prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', nextSong);
 
 coverArt.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
 });
-
 coverArt.addEventListener('touchend', (e) => {
   touchEndX = e.changedTouches[0].screenX;
   if (touchEndX < touchStartX) {
@@ -307,10 +315,13 @@ coverArt.addEventListener('touchend', (e) => {
   }
 });
 
-// Inisialisasi
+let touchStartX = 0;
+let touchEndX = 0;
+
 loadSong(currentIndex);
 loadPlaylist();
 </script>
+
 
 
 </body>
