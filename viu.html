@@ -157,7 +157,6 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 const songs = [
   { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
@@ -181,12 +180,12 @@ const coverArt = document.getElementById('coverArt');
 const backgroundBlur = document.getElementById('backgroundBlur');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
 const progressBar = document.getElementById('progressBar');
 const playlist = document.getElementById('playlist');
 const progressBarContainer = document.getElementById('progressBarContainer');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
-
 let touchStartX = 0;
 let touchEndX = 0;
 
@@ -197,31 +196,29 @@ function loadSong(index) {
   artistName.textContent = song.artist;
   coverArt.style.backgroundImage = `url('${song.cover}')`;
   backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-  document.title = `${song.title} - ${song.artist}`; // <- Ubah di sini
+  document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
-}
 
+  // Media Session API
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.title,
       artist: song.artist,
-      album: 'Spotify Premium',
-      artwork: [
-        { src: song.cover, sizes: '512x512', type: 'image/jpeg' }
-      ]
+      album: "Spotify Premium",
+      artwork: [{ src: song.cover, sizes: "512x512", type: "image/jpeg" }]
     });
 
-
-  navigator.mediaSession.setActionHandler('play', playSong);
-  navigator.mediaSession.setActionHandler('pause', pauseSong);
-  navigator.mediaSession.setActionHandler('previoustrack', () => {
-    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-    loadSong(currentIndex);
-  });
-  navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    navigator.mediaSession.setActionHandler("play", playSong);
+    navigator.mediaSession.setActionHandler("pause", pauseSong);
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+      loadSong(currentIndex);
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", nextSong);
+  }
 }
-  
+
 function playSong() {
   audio.play();
   isPlaying = true;
@@ -278,7 +275,9 @@ function loadPlaylist() {
       currentIndex = index;
       loadSong(currentIndex);
     });
-    if (index === currentIndex) div.classList.add('active-song');
+    if (index === currentIndex) {
+      div.classList.add('active-song');
+    }
     playlist.appendChild(div);
   });
   highlightCurrentSong();
@@ -292,6 +291,7 @@ audio.addEventListener('ended', nextSong);
 coverArt.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
 });
+
 coverArt.addEventListener('touchend', (e) => {
   touchEndX = e.changedTouches[0].screenX;
   if (touchEndX < touchStartX) {
@@ -304,9 +304,11 @@ coverArt.addEventListener('touchend', (e) => {
   }
 });
 
+// Inisialisasi
 loadSong(currentIndex);
 loadPlaylist();
 </script>
+
 
 </body>
 </html>
