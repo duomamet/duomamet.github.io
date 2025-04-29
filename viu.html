@@ -202,6 +202,25 @@ function loadSong(index) {
   playSong();
 }
 
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: songs[currentIndex].title,
+    artist: songs[currentIndex].artist,
+    album: 'Spotify Premium',
+    artwork: [
+      { src: songs[currentIndex].cover, sizes: '512x512', type: 'image/jpg' }
+    ]
+  });
+
+  navigator.mediaSession.setActionHandler('play', playSong);
+  navigator.mediaSession.setActionHandler('pause', pauseSong);
+  navigator.mediaSession.setActionHandler('previoustrack', () => {
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(currentIndex);
+  });
+  navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+}
+  
 function playSong() {
   audio.play();
   isPlaying = true;
