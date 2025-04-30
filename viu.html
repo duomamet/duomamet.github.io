@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spotify Premium</title>
 
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" type="image/svg+xml">
 
@@ -50,8 +52,14 @@
       background-size: cover;
       background-position: center;
       border-radius: 20px;
-      transition: transform 0.5s ease;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      position: relative;
     }
+    .cover-slide-out-left { transform: translateX(-100%); opacity: 0; }
+    .cover-slide-out-right { transform: translateX(100%); opacity: 0; }
+    .cover-slide-in-left { transform: translateX(-100%); opacity: 0; }
+    .cover-slide-in-right { transform: translateX(100%); opacity: 0; }
+    .cover-slide-active { transform: translateX(0); opacity: 1; }
     .song-title {
       margin-top: 10px;
       font-size: 1.2rem;
@@ -68,10 +76,8 @@
       color: #fff;
       font-size: 1.8rem;
       margin: 0 10px;
-      transition: transform 0.3s ease;
     }
     .controls button:active {
-      transform: scale(1);
       color: #1DB954;
     }
     .progress {
@@ -80,6 +86,7 @@
       margin-top: 20px;
       border-radius: 5px;
       overflow: hidden;
+      cursor: pointer;
     }
     .progress-bar {
       background-color: #1DB954;
@@ -88,13 +95,12 @@
     .time-info {
       display: flex;
       justify-content: space-between;
-      margin-top: 5px;
       font-size: 0.9rem;
+      color: #fff;
       padding: 0 5px;
     }
     .playlist {
       margin-top: 30px;
-      text-align: left;
       max-height: 200px;
       overflow-y: auto;
     }
@@ -116,189 +122,214 @@
   </style>
 </head>
 <body>
-
-<div class="background-blur" id="backgroundBlur"></div>
-
-<div class="player-card">
-  <div id="coverArt" class="song-cover"></div>
-
-  <div class="song-title" id="songTitle">Tekan Play</div>
-  <div class="artist-name" id="artistName">Nadin Amizah</div>
-
-  <div class="progress mt-3" id="progressBarContainer">
-    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+  <div class="background-blur" id="backgroundBlur"></div>
+  <div class="player-card">
+    <div id="coverArt" class="song-cover cover-slide-active"></div>
+    <div class="song-title" id="songTitle">Tekan Play</div>
+    <div class="artist-name" id="artistName">Nadin Amizah</div>
+    <div class="progress mt-3" id="progressBarContainer">
+      <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+    </div>
+    <div class="time-info">
+      <span id="currentTime">0:00</span>
+      <span id="totalDuration">0:00</span>
+    </div>
+    <div class="controls mt-3">
+      <button id="prevBtn"><i class="fas fa-backward"></i></button>
+      <button id="playPauseBtn"><i class="fas fa-play"></i></button>
+      <button id="nextBtn"><i class="fas fa-forward"></i></button>
+      <button id="shuffleBtn"><i class="fas fa-random"></i></button>
+    </div>
+    <div class="playlist" id="playlist"></div>
+    <audio id="audioPlayer" class="d-none"></audio>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const songs = [
+      { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "URL", cover: "URL" },
+      // tambahkan lagu lainnya di sini
+    ];
+    let currentIndex = Math.floor(Math.random() * songs.length);
+    let isPlaying = false;
+    let isShuffle = false;
+    let history = [];
 
-  <div class="time-info">
-    <span id="currentTime">0:00</span>
-    <span id="totalDuration">0:00</span>
-  </div>
+    const audio = document.getElementById('audioPlayer');
+    const songTitle = document.getElementById('songTitle');
+    const artistName = document.getElementById('artistName');
+    const coverArt = document.getElementById('coverArt');
+    const backgroundBlur = document.getElementById('backgroundBlur');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const progressBar = document.getElementById('progressBar');
+    const playlist = document.getElementById('playlist');
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalDurationEl = document.getElementById('totalDuration');
 
-  <div class="controls mt-3">
-    <button id="prevBtn"><i class="fas fa-backward"></i></button>
-    <button id="playPauseBtn"><i class="fas fa-play"></i></button>
-    <button id="nextBtn"><i class="fas fa-forward"></i></button>
-    <button id="shuffleBtn"><i class="fas fa-random"></i></button>
-  </div>
-
-  <div class="playlist" id="playlist"></div>
-
-  <audio id="audioPlayer" class="d-none"></audio>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-const songs = [
-  { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
-  { title: "Tapi Diterima", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Tapi%20Diterima%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
-  { title: "Forgot Password", artist: "Hindia ft. Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Hindia%20ft.%20Nadin%20Amizah%20-%20Forgot%20Password%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/hindianadin.jpg" },
-  { title: "Gagal Menjadi Manusia", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Gagal%20Menjadi%20Manusia.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Lagu Untukmu", artist: "Nidji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nidji%20-%20Lagu%20Untukmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/nidji.jpg" },
-  { title: "Kita Bisa Bersama", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Kita%20Bisa%20Bersama.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Akhirnya Ku Menemukanmu", artist: "Anji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Anji%20-%20Akhirnya%20Ku%20Menemukanmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/anji.jpg" },
-  { title: "Sampai Tua Nanti", artist: "Gigi", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Gigi%20-%20Sampai%20Tua%20Nanti.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/gigi.jpg" },
-  { title: "Pergi Pagi Pulang Pagi", artist: "Slank", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Slank%20-%20Pergi%20Pagi%20Pulang%20Pagi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/slank.jpg" },
-  { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
-];
-
-let currentIndex = Math.floor(Math.random() * songs.length);
-let isPlaying = false;
-let isShuffle = false;
-let history = [];
-
-const audio = document.getElementById('audioPlayer');
-const songTitle = document.getElementById('songTitle');
-const artistName = document.getElementById('artistName');
-const coverArt = document.getElementById('coverArt');
-const backgroundBlur = document.getElementById('backgroundBlur');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
-const shuffleBtn = document.getElementById('shuffleBtn');
-const progressBar = document.getElementById('progressBar');
-const playlist = document.getElementById('playlist');
-const currentTimeEl = document.getElementById('currentTime');
-const totalDurationEl = document.getElementById('totalDuration');
-
-function loadSong(index) {
-  const song = songs[index];
-  audio.src = song.file;
-  songTitle.textContent = song.title;
-  artistName.textContent = song.artist;
-  coverArt.style.backgroundImage = `url('${song.cover}')`;
-  backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-  document.title = `${song.title} - ${song.artist}`;
-  highlightCurrentSong();
-  playSong();
-
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.artist,
-      artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
-    });
-
-    navigator.mediaSession.setActionHandler('play', playSong);
-    navigator.mediaSession.setActionHandler('pause', pauseSong);
-    navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-  }
-}
-
-function playSong() {
-  audio.play();
-  isPlaying = true;
-  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-}
-
-function pauseSong() {
-  audio.pause();
-  isPlaying = false;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-}
-
-function playPause() {
-  isPlaying ? pauseSong() : playSong();
-}
-
-function nextSong() {
-  if (isShuffle) {
-    history.push(currentIndex);
-    currentIndex = Math.floor(Math.random() * songs.length);
-  } else {
-    currentIndex = (currentIndex + 1) % songs.length;
-  }
-  loadSong(currentIndex);
-}
-
-function prevSong() {
-  if (history.length > 0) {
-    currentIndex = history.pop();
-    loadSong(currentIndex);
-  } else {
-    audio.currentTime = 0;
-    if (!isPlaying) playSong();
-  }
-}
-
-function updateProgress() {
-  if (audio.duration) {
-    const progressPercent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = `${progressPercent}%`;
-    currentTimeEl.textContent = formatTime(audio.currentTime);
-    totalDurationEl.textContent = formatTime(audio.duration);
-  }
-}
-
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
-function highlightCurrentSong() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, index) => {
-    item.classList.toggle('active-song', index === currentIndex);
-    if (index === currentIndex) {
-      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    function loadSong(index) {
+      const song = songs[index];
+      audio.src = song.file;
+      songTitle.textContent = song.title;
+      artistName.textContent = song.artist;
+      coverArt.style.backgroundImage = `url('${song.cover}')`;
+      coverArt.className = 'song-cover cover-slide-active';
+      backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
+      document.title = `${song.title} - ${song.artist}`;
+      highlightCurrentSong();
+      playSong();
+      updateMediaSession(song);
     }
-  });
-}
 
-function loadPlaylist() {
-  playlist.innerHTML = '';
-  songs.forEach((song, index) => {
-    const div = document.createElement('div');
-    div.className = 'playlist-item';
-    div.textContent = song.title;
-    div.addEventListener('click', () => {
-      history.push(currentIndex);
-      currentIndex = index;
+    function playSong() {
+      audio.play();
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }
+
+    function pauseSong() {
+      audio.pause();
+      isPlaying = false;
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    }
+
+    function playPause() {
+      isPlaying ? pauseSong() : playSong();
+    }
+
+    function nextSong() {
+      if (isShuffle) {
+        history.push(currentIndex);
+        currentIndex = Math.floor(Math.random() * songs.length);
+      } else {
+        currentIndex = (currentIndex + 1) % songs.length;
+      }
       loadSong(currentIndex);
-    });
-    if (index === currentIndex) {
-      div.classList.add('active-song');
     }
-    playlist.appendChild(div);
-  });
-  highlightCurrentSong();
-}
 
-shuffleBtn.addEventListener('click', () => {
-  isShuffle = !isShuffle;
-  shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
-});
+    function prevSong() {
+      if (history.length > 0) {
+        currentIndex = history.pop();
+        loadSong(currentIndex);
+      } else {
+        audio.currentTime = 0;
+        if (!isPlaying) playSong();
+      }
+    }
 
-playPauseBtn.addEventListener('click', playPause);
-nextBtn.addEventListener('click', nextSong);
-prevBtn.addEventListener('click', prevSong);
-audio.addEventListener('timeupdate', updateProgress);
-audio.addEventListener('ended', nextSong);
+    function updateProgress() {
+      if (audio.duration) {
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+        totalDurationEl.textContent = formatTime(audio.duration);
+      }
+    }
 
-loadSong(currentIndex);
-loadPlaylist();
-</script>
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
 
+    function highlightCurrentSong() {
+      const items = document.querySelectorAll('.playlist-item');
+      items.forEach((item, index) => {
+        item.classList.toggle('active-song', index === currentIndex);
+      });
+    }
+
+    function loadPlaylist() {
+      playlist.innerHTML = '';
+      songs.forEach((song, index) => {
+        const div = document.createElement('div');
+        div.className = 'playlist-item';
+        div.textContent = song.title;
+        div.addEventListener('click', () => {
+          history.push(currentIndex);
+          currentIndex = index;
+          loadSong(currentIndex);
+        });
+        playlist.appendChild(div);
+      });
+      highlightCurrentSong();
+    }
+
+    function seek(e) {
+      const rect = progressBarContainer.getBoundingClientRect();
+      const offsetX = e.touches ? e.touches[0].clientX - rect.left : e.offsetX;
+      const percent = offsetX / rect.width;
+      audio.currentTime = percent * audio.duration;
+    }
+
+    progressBarContainer.addEventListener('click', seek);
+    progressBarContainer.addEventListener('touchstart', seek);
+
+    function updateMediaSession(song) {
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: song.title,
+          artist: song.artist,
+          artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
+        });
+        navigator.mediaSession.setActionHandler('play', playSong);
+        navigator.mediaSession.setActionHandler('pause', pauseSong);
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+      }
+    }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    coverArt.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    coverArt.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          animateCover('left', nextSong);
+        } else {
+          animateCover('right', prevSong);
+        }
+      }
+    }
+
+    function animateCover(direction, callback) {
+      const outClass = direction === 'left' ? 'cover-slide-out-left' : 'cover-slide-out-right';
+      const inClass = direction === 'left' ? 'cover-slide-in-right' : 'cover-slide-in-left';
+      coverArt.classList.add(outClass);
+      setTimeout(() => {
+        callback();
+        coverArt.className = 'song-cover ' + inClass;
+        setTimeout(() => {
+          coverArt.className = 'song-cover cover-slide-active';
+        }, 50);
+      }, 300);
+    }
+
+    shuffleBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
+    });
+
+    playPauseBtn.addEventListener('click', playPause);
+    nextBtn.addEventListener('click', () => animateCover('left', nextSong));
+    prevBtn.addEventListener('click', () => animateCover('right', prevSong));
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', () => animateCover('left', nextSong));
+
+    loadSong(currentIndex);
+    loadPlaylist();
+  </script>
 </body>
 </html>
