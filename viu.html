@@ -49,10 +49,10 @@
       transition: transform 0.4s ease, opacity 0.4s ease;
       touch-action: pan-y;
     }
-    .slideLeft {
+    .slide-left {
       animation: slideLeft 0.4s forwards;
     }
-    .slideRight {
+    .slide-right {
       animation: slideRight 0.4s forwards;
     }
     @keyframes slideLeft {
@@ -127,6 +127,15 @@
       color: #1DB954;
       font-weight: bold;
     }
+    .loading-spinner {
+      font-size: 1.8rem;
+      color: #1DB954;
+      animation: spin 1s infinite linear;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -166,19 +175,16 @@ const songs = [
   { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
   { title: "Tapi Diterima", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Tapi%20Diterima%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
   { title: "Forgot Password", artist: "Hindia ft. Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Hindia%20ft.%20Nadin%20Amizah%20-%20Forgot%20Password%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/hindianadin.jpg" },
-  { title: "Gagal Menjadi Manusia", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Gagal%20Menjadi%20Manusia.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Lagu Untukmu", artist: "Nidji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nidji%20-%20Lagu%20Untukmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/nidji.jpg" },
-  { title: "Kita Bisa Bersama", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Kita%20Bisa%20Bersama.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Akhirnya Ku Menemukanmu", artist: "Anji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Anji%20-%20Akhirnya%20Ku%20Menemukanmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/anji.jpg" },
-  { title: "Sampai Tua Nanti", artist: "Gigi", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Gigi%20-%20Sampai%20Tua%20Nanti.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/gigi.jpg" },
-  { title: "Pergi Pagi Pulang Pagi", artist: "Slank", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Slank%20-%20Pergi%20Pagi%20Pulang%20Pagi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/slank.jpg" },
-  { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
-];
+  { title: "Gagal Menjadi Manusia", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Gagal%20Menjadi%20Manusia.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" }
+ ];
+
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
 let isShuffle = false;
 let history = [];
-let xStart = null, xMove = null, isDragging = false;
+let xStart = null;
+let xMove = null;
+let isDragging = false;
 
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
@@ -197,27 +203,31 @@ const totalDurationEl = document.getElementById('totalDuration');
 
 function loadSong(index, direction = '') {
   const song = songs[index];
-  coverArt.classList.remove('slideLeft', 'slideRight');
-  void coverArt.offsetWidth;
-  if (direction) coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
+  if (direction) {
+    coverArt.classList.remove('slide-left', 'slide-right');
+    void coverArt.offsetWidth;
+    coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
+  }
+
+  // Menambahkan indikator loading
+  playPauseBtn.innerHTML = '<i class="loading-spinner fas fa-spinner"></i>';
   setTimeout(() => {
     audio.src = song.file;
+    audio.load(); // Memuat ulang lagu
     songTitle.textContent = song.title;
     artistName.textContent = song.artist;
     coverArt.style.backgroundImage = `url('${song.cover}')`;
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
     document.title = `${song.title} - ${song.artist}`;
     highlightCurrentSong();
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.title,
-        artist: song.artist,
-        artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
-      });
-    }
     playSong();
   }, direction ? 400 : 0);
 }
+
+// Tangani error audio source
+audio.onerror = function() {
+  playPauseBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; // Ganti dengan ikon error
+};
 
 function playSong() {
   audio.play();
@@ -229,6 +239,7 @@ function pauseSong() {
   isPlaying = false;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
+
 function nextSong() {
   if (isShuffle) {
     history.push(currentIndex);
@@ -247,6 +258,7 @@ function prevSong() {
     if (!isPlaying) playSong();
   }
 }
+
 function updateProgress() {
   if (!isDragging && audio.duration) {
     const percent = (audio.currentTime / audio.duration) * 100;
@@ -255,16 +267,19 @@ function updateProgress() {
     totalDurationEl.textContent = formatTime(audio.duration);
   }
 }
+
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
+
 function highlightCurrentSong() {
   document.querySelectorAll('.playlist-item').forEach((item, i) => {
     item.classList.toggle('active-song', i === currentIndex);
   });
 }
+
 function loadPlaylist() {
   playlist.innerHTML = '';
   songs.forEach((song, index) => {
@@ -280,51 +295,14 @@ function loadPlaylist() {
   });
   highlightCurrentSong();
 }
-function handleTouchStart(evt) {
-  xStart = evt.touches[0].clientX;
-}
-function handleTouchMove(evt) {
-  xMove = evt.touches[0].clientX;
-}
-function handleTouchEnd() {
-  if (!xStart || !xMove) return;
-  const diff = xStart - xMove;
-  if (Math.abs(diff) > 50) {
-    diff > 0 ? nextSong() : prevSong();
-  }
-  xStart = xMove = null;
-}
 
-progressContainer.addEventListener('touchstart', () => isDragging = true);
-progressContainer.addEventListener('touchmove', (e) => {
-  const rect = progressContainer.getBoundingClientRect();
-  const touchX = e.touches[0].clientX;
-  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
-  progressBar.style.width = `${percent * 100}%`;
-  if (audio.duration) {
-    const seekTime = percent * audio.duration;
-    currentTimeEl.textContent = formatTime(seekTime);
-    totalDurationEl.textContent = formatTime(audio.duration);
-  }
-});
-progressContainer.addEventListener('touchend', (e) => {
-  const rect = progressContainer.getBoundingClientRect();
-  const touchX = e.changedTouches[0].clientX;
-  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
-  audio.currentTime = percent * audio.duration;
-  isDragging = false;
-});
-
-shuffleBtn.addEventListener('click', () => {
-  isShuffle = !isShuffle;
-  shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
-});
 playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', nextSong);
 
+// Load initial song and playlist
 loadSong(currentIndex);
 loadPlaylist();
 </script>
