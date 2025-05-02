@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Spotify Premium</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" type="image/svg+xml">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -34,14 +31,13 @@
       opacity: 0.5;
     }
     .player-card {
-      position: fixed;
       background-color: rgba(0, 0, 0, 0.6);
       border-radius: 20px;
       padding: 30px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       backdrop-filter: blur(10px);
     }
     .song-cover {
@@ -50,7 +46,22 @@
       background-size: cover;
       background-position: center;
       border-radius: 20px;
-      transition: transform 0.5s ease;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      touch-action: pan-y;
+    }
+    .slideLeft {
+      animation: slideLeft 0.4s forwards;
+    }
+    .slideRight {
+      animation: slideRight 0.4s forwards;
+    }
+    @keyframes slideLeft {
+      0% { transform: translateX(100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideRight {
+      0% { transform: translateX(-100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
     }
     .song-title {
       margin-top: 10px;
@@ -80,10 +91,13 @@
       margin-top: 20px;
       border-radius: 5px;
       overflow: hidden;
+      position: relative;
     }
     .progress-bar {
       background-color: #1DB954;
       height: 100%;
+      width: 0%;
+      transition: none;
     }
     .time-info {
       display: flex;
@@ -120,13 +134,14 @@
 <div class="background-blur" id="backgroundBlur"></div>
 
 <div class="player-card">
-  <div id="coverArt" class="song-cover"></div>
+  <div id="coverArt" class="song-cover"
+       ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd(event)"></div>
 
   <div class="song-title" id="songTitle">Tekan Play</div>
   <div class="artist-name" id="artistName">Nadin Amizah</div>
 
   <div class="progress mt-3" id="progressBarContainer">
-    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+    <div class="progress-bar" id="progressBar"></div>
   </div>
 
   <div class="time-info">
@@ -146,7 +161,6 @@
   <audio id="audioPlayer" class="d-none"></audio>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const songs = [
   { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Berpayung%20Tuhan%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
@@ -160,11 +174,11 @@ const songs = [
   { title: "Pergi Pagi Pulang Pagi", artist: "Slank", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Slank%20-%20Pergi%20Pagi%20Pulang%20Pagi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/slank.jpg" },
   { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
 ];
-
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
 let isShuffle = false;
 let history = [];
+let xStart = null, xMove = null, isDragging = false;
 
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
@@ -176,33 +190,33 @@ const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
 const progressBar = document.getElementById('progressBar');
+const progressContainer = document.getElementById('progressBarContainer');
 const playlist = document.getElementById('playlist');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
-function loadSong(index) {
+function loadSong(index, direction = '') {
   const song = songs[index];
-  audio.src = song.file;
-  songTitle.textContent = song.title;
-  artistName.textContent = song.artist;
-  coverArt.style.backgroundImage = `url('${song.cover}')`;
-  backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-  document.title = `${song.title} - ${song.artist}`;
-  highlightCurrentSong();
-  playSong();
-
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.artist,
-      artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
-    });
-
-    navigator.mediaSession.setActionHandler('play', playSong);
-    navigator.mediaSession.setActionHandler('pause', pauseSong);
-    navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-  }
+  coverArt.classList.remove('slideLeft', 'slideRight');
+  void coverArt.offsetWidth;
+  if (direction) coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
+  setTimeout(() => {
+    audio.src = song.file;
+    songTitle.textContent = song.title;
+    artistName.textContent = song.artist;
+    coverArt.style.backgroundImage = `url('${song.cover}')`;
+    backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
+    document.title = `${song.title} - ${song.artist}`;
+    highlightCurrentSong();
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artist,
+        artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
+      });
+    }
+    playSong();
+  }, direction ? 400 : 0);
 }
 
 function playSong() {
@@ -210,17 +224,11 @@ function playSong() {
   isPlaying = true;
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 }
-
 function pauseSong() {
   audio.pause();
   isPlaying = false;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
-
-function playPause() {
-  isPlaying ? pauseSong() : playSong();
-}
-
 function nextSong() {
   if (isShuffle) {
     history.push(currentIndex);
@@ -228,44 +236,35 @@ function nextSong() {
   } else {
     currentIndex = (currentIndex + 1) % songs.length;
   }
-  loadSong(currentIndex);
+  loadSong(currentIndex, 'left');
 }
-
 function prevSong() {
   if (history.length > 0) {
     currentIndex = history.pop();
-    loadSong(currentIndex);
+    loadSong(currentIndex, 'right');
   } else {
     audio.currentTime = 0;
     if (!isPlaying) playSong();
   }
 }
-
 function updateProgress() {
-  if (audio.duration) {
-    const progressPercent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+  if (!isDragging && audio.duration) {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.width = `${percent}%`;
     currentTimeEl.textContent = formatTime(audio.currentTime);
     totalDurationEl.textContent = formatTime(audio.duration);
   }
 }
-
 function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
-
 function highlightCurrentSong() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, index) => {
-    item.classList.toggle('active-song', index === currentIndex);
-    if (index === currentIndex) {
-      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  document.querySelectorAll('.playlist-item').forEach((item, i) => {
+    item.classList.toggle('active-song', i === currentIndex);
   });
 }
-
 function loadPlaylist() {
   playlist.innerHTML = '';
   songs.forEach((song, index) => {
@@ -277,20 +276,50 @@ function loadPlaylist() {
       currentIndex = index;
       loadSong(currentIndex);
     });
-    if (index === currentIndex) {
-      div.classList.add('active-song');
-    }
     playlist.appendChild(div);
   });
   highlightCurrentSong();
 }
+function handleTouchStart(evt) {
+  xStart = evt.touches[0].clientX;
+}
+function handleTouchMove(evt) {
+  xMove = evt.touches[0].clientX;
+}
+function handleTouchEnd() {
+  if (!xStart || !xMove) return;
+  const diff = xStart - xMove;
+  if (Math.abs(diff) > 50) {
+    diff > 0 ? nextSong() : prevSong();
+  }
+  xStart = xMove = null;
+}
+
+progressContainer.addEventListener('touchstart', () => isDragging = true);
+progressContainer.addEventListener('touchmove', (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const touchX = e.touches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
+  progressBar.style.width = `${percent * 100}%`;
+  if (audio.duration) {
+    const seekTime = percent * audio.duration;
+    currentTimeEl.textContent = formatTime(seekTime);
+    totalDurationEl.textContent = formatTime(audio.duration);
+  }
+});
+progressContainer.addEventListener('touchend', (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const touchX = e.changedTouches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
+  audio.currentTime = percent * audio.duration;
+  isDragging = false;
+});
 
 shuffleBtn.addEventListener('click', () => {
   isShuffle = !isShuffle;
   shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
 });
-
-playPauseBtn.addEventListener('click', playPause);
+playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
@@ -299,6 +328,5 @@ audio.addEventListener('ended', nextSong);
 loadSong(currentIndex);
 loadPlaylist();
 </script>
-
 </body>
 </html>
