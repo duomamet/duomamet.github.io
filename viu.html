@@ -32,14 +32,13 @@
       opacity: 0.5;
     }
     .player-card {
-      position: fixed;
       background-color: rgba(0, 0, 0, 0.6);
       border-radius: 20px;
       padding: 30px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       backdrop-filter: blur(10px);
     }
     .song-cover {
@@ -48,8 +47,16 @@
       background-size: cover;
       background-position: center;
       border-radius: 20px;
-      transition: transform 0.5s ease;
+      transition: transform 0.4s ease, opacity 0.4s ease;
       touch-action: pan-y;
+    }
+    .slide-left {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    .slide-right {
+      transform: translateX(100%);
+      opacity: 0;
     }
     .song-title {
       margin-top: 10px;
@@ -79,12 +86,14 @@
       margin-top: 20px;
       border-radius: 5px;
       overflow: hidden;
-      cursor: pointer;
+      position: relative;
+      touch-action: none;
     }
     .progress-bar {
       background-color: #1DB954;
       height: 100%;
       width: 0%;
+      transition: width 0.1s linear;
     }
     .time-info {
       display: flex;
@@ -122,7 +131,7 @@
 
 <div class="player-card">
   <div id="coverArt" class="song-cover"
-       ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)"></div>
+       ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd(event)"></div>
 
   <div class="song-title" id="songTitle">Tekan Play</div>
   <div class="artist-name" id="artistName">Nadin Amizah</div>
@@ -159,6 +168,8 @@ let isPlaying = false;
 let isShuffle = false;
 let history = [];
 let xStart = null;
+let xMove = null;
+let isDragging = false;
 
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
@@ -175,8 +186,20 @@ const playlist = document.getElementById('playlist');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
-function loadSong(index) {
+function loadSong(index, direction = '') {
   const song = songs[index];
+  if (direction) {
+    coverArt.classList.add(direction === 'left' ? 'slide-left' : 'slide-right');
+    setTimeout(() => {
+      applySong(song);
+      coverArt.classList.remove('slide-left', 'slide-right');
+    }, 400);
+  } else {
+    applySong(song);
+  }
+}
+
+function applySong(song) {
   audio.src = song.file;
   songTitle.textContent = song.title;
   artistName.textContent = song.artist;
@@ -185,14 +208,6 @@ function loadSong(index) {
   document.title = `${song.title} - ${song.artist}`;
   highlightCurrentSong();
   playSong();
-
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.artist,
-      artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
-    });
-  }
 }
 
 function playSong() {
@@ -207,10 +222,6 @@ function pauseSong() {
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
 
-function playPause() {
-  isPlaying ? pauseSong() : playSong();
-}
-
 function nextSong() {
   if (isShuffle) {
     history.push(currentIndex);
@@ -218,13 +229,13 @@ function nextSong() {
   } else {
     currentIndex = (currentIndex + 1) % songs.length;
   }
-  loadSong(currentIndex);
+  loadSong(currentIndex, 'left');
 }
 
 function prevSong() {
   if (history.length > 0) {
     currentIndex = history.pop();
-    loadSong(currentIndex);
+    loadSong(currentIndex, 'right');
   } else {
     audio.currentTime = 0;
     if (!isPlaying) playSong();
@@ -232,27 +243,23 @@ function prevSong() {
 }
 
 function updateProgress() {
-  if (audio.duration) {
-    const progressPercent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+  if (!isDragging && audio.duration) {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.width = `${percent}%`;
     currentTimeEl.textContent = formatTime(audio.currentTime);
     totalDurationEl.textContent = formatTime(audio.duration);
   }
 }
 
 function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
 function highlightCurrentSong() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, index) => {
-    item.classList.toggle('active-song', index === currentIndex);
-    if (index === currentIndex) {
-      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  document.querySelectorAll('.playlist-item').forEach((item, i) => {
+    item.classList.toggle('active-song', i === currentIndex);
   });
 }
 
@@ -267,46 +274,52 @@ function loadPlaylist() {
       currentIndex = index;
       loadSong(currentIndex);
     });
-    if (index === currentIndex) {
-      div.classList.add('active-song');
-    }
     playlist.appendChild(div);
   });
   highlightCurrentSong();
 }
 
-// Swipe gesture handler
+// Swipe gesture
 function handleTouchStart(evt) {
   xStart = evt.touches[0].clientX;
 }
+function handleTouchMove(evt) {
+  xMove = evt.touches[0].clientX;
+}
 function handleTouchEnd(evt) {
-  if (!xStart) return;
-  const xEnd = evt.changedTouches[0].clientX;
-  const diff = xStart - xEnd;
+  if (!xStart || !xMove) return;
+  const diff = xStart - xMove;
   if (Math.abs(diff) > 50) {
     if (diff > 0) nextSong(); else prevSong();
   }
-  xStart = null;
+  xStart = xMove = null;
 }
 
-// Seek on progress bar click
-progressContainer.addEventListener('click', (e) => {
+// Seek on drag
+progressContainer.addEventListener('touchstart', () => isDragging = true);
+progressContainer.addEventListener('touchmove', (e) => {
   const rect = progressContainer.getBoundingClientRect();
-  const percent = (e.clientX - rect.left) / rect.width;
+  const touchX = e.touches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
+  progressBar.style.width = `${percent * 100}%`;
+});
+progressContainer.addEventListener('touchend', (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const touchX = e.changedTouches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
   audio.currentTime = percent * audio.duration;
+  isDragging = false;
 });
 
 shuffleBtn.addEventListener('click', () => {
   isShuffle = !isShuffle;
   shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
 });
-playPauseBtn.addEventListener('click', playPause);
+playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
-audio.addEventListener('ended', () => {
-  nextSong();
-});
+audio.addEventListener('ended', nextSong);
 
 loadSong(currentIndex);
 loadPlaylist();
