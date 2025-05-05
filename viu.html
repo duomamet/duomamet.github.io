@@ -195,6 +195,18 @@ const playlist = document.getElementById('playlist');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
+   async function cacheAndPlaySong(url) {
+    const cache = await caches.open('music-cache');
+    let response = await cache.match(url);
+    if (!response) {
+      response = await fetch(url);
+      cache.put(url, response.clone());
+    }
+    const blob = await response.blob();
+    audio.src = URL.createObjectURL(blob);
+    audio.play();
+  }
+
 function loadSong(index, direction = '') {
   const song = songs[index];
   coverArt.classList.remove('slideLeft', 'slideRight');
@@ -256,68 +268,77 @@ function updateProgress() {
   }
 }
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' + secs : secs}`;
-}
-function toggleShuffle() {
-  isShuffle = !isShuffle;
-  shuffleBtn.classList.toggle('active', isShuffle);
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 function highlightCurrentSong() {
-  const items = playlist.getElementsByClassName('playlist-item');
-  for (let i = 0; i < items.length; i++) {
-    items[i].classList.remove('active-song');
-  }
-  if (items[currentIndex]) {
-    items[currentIndex].classList.add('active-song');
-  }
+  document.querySelectorAll('.playlist-item').forEach((item, i) => {
+    item.classList.toggle('active-song', i === currentIndex);
+  });
 }
-function createPlaylist() {
+function loadPlaylist() {
+  playlist.innerHTML = '';
   songs.forEach((song, index) => {
     const div = document.createElement('div');
-    div.classList.add('playlist-item');
+    div.className = 'playlist-item';
     div.textContent = song.title;
-    div.onclick = () => {
+    div.addEventListener('click', () => {
       history.push(currentIndex);
       currentIndex = index;
       loadSong(currentIndex);
-    };
+    });
     playlist.appendChild(div);
   });
+  highlightCurrentSong();
 }
-createPlaylist();
+function handleTouchStart(evt) {
+  xStart = evt.touches[0].clientX;
+}
+function handleTouchMove(evt) {
+  xMove = evt.touches[0].clientX;
+}
+function handleTouchEnd() {
+  if (!xStart || !xMove) return;
+  const diff = xStart - xMove;
+  if (Math.abs(diff) > 50) {
+    diff > 0 ? nextSong() : prevSong();
+  }
+  xStart = xMove = null;
+}
+
+progressContainer.addEventListener('touchstart', () => isDragging = true);
+progressContainer.addEventListener('touchmove', (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const touchX = e.touches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
+  progressBar.style.width = `${percent * 100}%`;
+  if (audio.duration) {
+    const seekTime = percent * audio.duration;
+    currentTimeEl.textContent = formatTime(seekTime);
+    totalDurationEl.textContent = formatTime(audio.duration);
+  }
+});
+progressContainer.addEventListener('touchend', (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const touchX = e.changedTouches[0].clientX;
+  const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
+  audio.currentTime = percent * audio.duration;
+  isDragging = false;
+});
+
+shuffleBtn.addEventListener('click', () => {
+  isShuffle = !isShuffle;
+  shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
+});
 playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
-shuffleBtn.addEventListener('click', toggleShuffle);
 audio.addEventListener('timeupdate', updateProgress);
-progressContainer.addEventListener('click', (e) => {
-  const progressWidth = progressContainer.offsetWidth;
-  const clickPosition = e.offsetX;
-  const newTime = (clickPosition / progressWidth) * audio.duration;
-  audio.currentTime = newTime;
-});
-let isDragging = false;
-let dragStartX = 0;
-let dragCurrentX = 0;
-let dragCurrentTime = 0;
-progressBar.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  dragStartX = e.clientX;
-  dragCurrentTime = audio.currentTime;
-});
-document.addEventListener('mousemove', (e) => {
-  if (isDragging) {
-    const dragDistance = e.clientX - dragStartX;
-    const dragPercentage = dragDistance / progressContainer.offsetWidth;
-    audio.currentTime = dragCurrentTime + dragPercentage * audio.duration;
-  }
-});
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
-</script>
+audio.addEventListener('ended', nextSong);
 
+loadSong(currentIndex);
+loadPlaylist();
+</script>
 </body>
 </html>
