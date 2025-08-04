@@ -46,7 +46,7 @@
     }
     .song-cover {
       width: 100%;
-      height: 300px;
+      height: 320px;
       background-size: cover;
       background-position: center;
       border-radius: 20px;
@@ -308,26 +308,6 @@ function loadPlaylist() {
     playlist.appendChild(div);
   });
   highlightCurrentSong();
-}
-
-// === Fungsi: Gestur Swipe - Mulai Sentuhan ===
-function handleTouchStart(evt) {
-  xStart = evt.touches[0].clientX;
-}
-
-// === Fungsi: Gestur Swipe - Pergerakan ===
-function handleTouchMove(evt) {
-  xMove = evt.touches[0].clientX;
-}
-
-// === Fungsi: Gestur Swipe - Akhiri Sentuhan ===
-function handleTouchEnd() {
-  if (!xStart || !xMove) return;
-  const diff = xStart - xMove;
-  if (Math.abs(diff) > 50) {
-    diff > 0 ? nextSong() : prevSong();
-  }
-  xStart = xMove = null;
 }
 
 // === Event: Seek Manual via Touch ===
