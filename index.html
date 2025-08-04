@@ -1,382 +1,322 @@
 <!DOCTYPE html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Spotify Premium</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
-    <!-- Favicon Spotify (versi lengkap) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="https://open.spotifycdn.com/cdn/images/favicon32.b64ecc03.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://open.spotifycdn.com/cdn/images/favicon16.1c487bff.png">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23A9A9A9' d='M96 64h320c17.7 0 32 14.3 32 32V320c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32zm0 384h320c17.7 0 32 14.3 32 32s-14.3 32-32 32H96c-17.7 0-32-14.3-32-32s14.3-32 32-32z'/%3E%3C/svg%3E">
+
+    <title>eBox - Nonton Gratis</title>
+     
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #121212;
-        color: #fff;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        font-family: 'Poppins', sans-serif;
-      }
-
-      .background-blur {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        filter: blur(20px);
-        z-index: -1;
-        opacity: 0.5;
-      }
-
-      .player-card {
-        background-color: rgba(0, 0, 0, 0.6);
-        border-radius: 20px;
-        padding: 30px;
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(10px);
-      }
-
-      .song-cover {
-        width: 100%;
-        height: 300px;
-        background-size: cover;
-        background-position: center;
-        border-radius: 20px;
-        transition: transform 0.4s ease, opacity 0.4s ease;
-        touch-action: pan-y;
-      }
-
-      .slideLeft {
-        animation: slideLeft 0.4s forwards;
-      }
-
-      .slideRight {
-        animation: slideRight 0.4s forwards;
-      }
-
-      @keyframes slideLeft {
-        0% {
-          transform: translateX(100%);
-          opacity: 0;
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+        body {
+            font-family: Roboto;
+            background-color: #000;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            color: white;
+            overflow: hidden;
         }
 
-        100% {
-          transform: translateX(0);
-          opacity: 1;
+        .sidebar {
+            width: 220px;
+            background-color: #222;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: stretch;
+            margin-right: 20px;
+            
         }
-      }
 
-      @keyframes slideRight {
-        0% {
-          transform: translateX(-100%);
-          opacity: 0;
+          .sidebar.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            width: 80px;
         }
 
-        100% {
-          transform: translateX(0);
-          opacity: 1;
+        .sidebar h2 { 
+            color: green;
+            margin-bottom: 30px;
+            font-size: 40px;
+            text-align: center;
+            text-transform: none;
         }
-      }
 
-      .song-title {
-        margin-top: 10px;
-        font-size: 1.2rem;
-        font-weight: 600;
-      }
+        
 
-      .artist-name {
-        font-size: 0.9rem;
-        color: #aaa;
-        margin-top: 5px;
-      }
+       .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: left; /* Tetap rata kiri */
+        }
 
-      .controls button {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 1.8rem;
-        margin: 0 10px;
-        transition: transform 0.3s ease;
-      }
+        .sidebar ul li {
+            margin-bottom: 15px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 20px;
+        }
 
-      .controls button:active {
-        transform: scale(1);
-        color: #1DB954;
-      }
+        .sidebar ul li.focused {
+            background-color: #3d3d3d; /* Background abu-abu gelap */
+    border: 2px solid #3d3d3d; /* Border abu-abu gelap */
+    padding: 4px 8px; /* Penyesuaian padding untuk memperhatikan border */
+        }
 
-      .progress {
-        height: 5px;
-        background: #555;
-        margin-top: 20px;
-        border-radius: 5px;
-        overflow: hidden;
-        position: relative;
-      }
+        .sidebar ul li:last-child.focused {
+        background-color: red; /* Background merah */
+            border: 2px solid red; /* Border merah */
+            padding: 4px 8px; /* Penyesuaian padding untuk memperhatikan border */
+    
+}
+        .sidebar ul li:last-child {
+            margin-top: 40px;
+        }
 
-      .progress-bar {
-        background-color: #1DB954;
-        height: 100%;
-        width: 0%;
-        transition: none;
-      }
+        .text{
+            margin-left: 5px;
+        }
 
-      .time-info {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 5px;
-        font-size: 0.9rem;
-        padding: 0 5px;
-      }
+    
+       /* Menyembunyikan teks saat sidebar dinonaktifkan */
+.sidebar.disabled ul li .text {
+    display: none;
+}
 
-      .playlist {
-        margin-top: 30px;
-        text-align: left;
-        max-height: 200px;
-        overflow-y: auto;
-      }
 
-      .playlist::-webkit-scrollbar {
-        display: none;
-      }
+/* Mengatur ukuran ikon lebih besar saat sidebar dinonaktifkan */
+.sidebar.disabled ul li span {
+    font-size: 24px;
+}
 
-      .playlist-item {
-        padding: 10px;
-        border-bottom: 1px solid #333;
-        cursor: pointer;
-      }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            overflow: hidden;
+            align-items: flex-start; /* Mengatur posisi slider agar lebih dekat ke sidebar */
+        }
 
-      .active-song {
-        color: #1DB954;
-        font-weight: bold;
-      }
+        .slider {
+            display: flex;
+            overflow: visible;
+            width: 80%;
+            position: relative;
+        }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .slide {
+            width: 240px;
+            height: 135px;
+            margin: 0 5px;
+            background-color: #444;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            border-radius: 10px;
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.3s, transform 0.3s, border 0.3s;
+        }
+
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .slider.focused {
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .slider:not(.focused) .slide {
+            transition: none;
+        }
+
+        .slider:not(.focused) .slide.active {
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
+img{
+  text-indent:-9999px;
+    text-align: center;
+}
+      
     </style>
-  </head>
-  <body>
-    <div class="background-blur" id="backgroundBlur"></div>
-    <div class="player-card">
-      <div id="coverArt" class="song-cover" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd(event)"></div>
-      <div class="song-title" id="songTitle">Tekan Play</div>
-      <div class="artist-name" id="artistName">Nadin Amizah</div>
-      <div class="progress mt-3" id="progressBarContainer">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div class="time-info">
-        <span id="currentTime">0:00</span>
-        <span id="totalDuration">0:00</span>
-      </div>
-      <div class="controls mt-3">
-        <button id="prevBtn">
-          <i class="fas fa-backward"></i>
-        </button>
-        <button id="playPauseBtn">
-          <i class="fas fa-play"></i>
-        </button>
-        <button id="nextBtn">
-          <i class="fas fa-forward"></i>
-        </button>
-        <button id="shuffleBtn">
-          <i class="fas fa-random"></i>
-        </button>
-      </div>
-      <div class="playlist" id="playlist"></div>
-      <audio id="audioPlayer" class="d-none"></audio>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <h2><i class="fab fa-android"></i></h2>
+        <ul id="menuList">
+    <li><span class="fas fa-tv"></span><span class="text">Local</span></li>
+    <li><span class="fas fa-film"></span><span class="text">Entertainment</span></li>
+    <li><span class="fas fa-football-ball"></span><span class="text">Sports</span></li>
+    <li><span class="fas fa-book"></span><span class="text">Knowledge</span></li>
+    <li><span class="fas fa-video"></span><span class="text">Movies</span></li>
+    <li><span class="fas fa-info-circle"></span><span class="text">About</span></li>
+    <li><span class="fas fa-power-off"></span><span class="text">Exit</span></li>
+</ul>
+
     </div>
-    <script type="module">
-      import {
-        songs
-      } from '/assets/js/playlist.js'; // Pastikan path sesuai lokasi file
-      // === Variabel Utama ===
-      let currentIndex = Math.floor(Math.random() * songs.length);
-      let isPlaying = false;
-      let isShuffle = false;
-      let history = [];
-      let xStart = null,
-        xMove = null,
-        isDragging = false;
-      // === DOM Element Referensi ===
-      const audio = document.getElementById('audioPlayer');
-      const songTitle = document.getElementById('songTitle');
-      const artistName = document.getElementById('artistName');
-      const coverArt = document.getElementById('coverArt');
-      const backgroundBlur = document.getElementById('backgroundBlur');
-      const playPauseBtn = document.getElementById('playPauseBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const prevBtn = document.getElementById('prevBtn');
-      const shuffleBtn = document.getElementById('shuffleBtn');
-      const progressBar = document.getElementById('progressBar');
-      const progressContainer = document.getElementById('progressBarContainer');
-      const playlist = document.getElementById('playlist');
-      const currentTimeEl = document.getElementById('currentTime');
-      const totalDurationEl = document.getElementById('totalDuration');
-      // === Fungsi: Memuat Lagu ===
-      function loadSong(index, direction = '') {
-        const song = songs[index];
-        coverArt.classList.remove('slideLeft', 'slideRight');
-        void coverArt.offsetWidth;
-        if (direction) coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
-        setTimeout(() => {
-          audio.src = song.file;
-          songTitle.textContent = song.title;
-          artistName.textContent = song.artist;
-          coverArt.style.backgroundImage = `url('${song.cover}')`;
-          backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
-          document.title = `${song.title} - ${song.artist}`;
-          highlightCurrentSong();
-          // ✅ Media Session API + Kontrol Notifikasi
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-              title: song.title,
-              artist: song.artist,
-              artwork: [{
-                src: song.cover,
-                sizes: '512x512',
-                type: 'image/jpeg'
-              }]
+
+    <div class="main" id="carouselContainer">
+        <div class="slider" id="slider1">
+            <div class="slider-track" id="sliderTrack1">
+                <div class="slide active"><img src="https://via.placeholder.com/200x120?text=1" alt="Slide 1"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=2" alt="Slide 2"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=3" alt="Slide 3"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=4" alt="Slide 4"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=5" alt="Slide 5"></div>
+            </div>
+        </div>
+
+        <div class="slider" id="slider2">
+            <div class="slider-track" id="sliderTrack2">
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=A" alt="Slide A"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=B" alt="Slide B"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=C" alt="Slide C"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=D" alt="Slide D"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=E" alt="Slide E"></div>
+            </div>
+        </div>
+
+        <div class="slider" id="slider3">
+            <div class="slider-track" id="sliderTrack3">
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=I" alt="Slide I"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=II" alt="Slide II"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=III" alt="Slide III"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=IV" alt="Slide IV"></div>
+                <div class="slide"><img src="https://via.placeholder.com/200x120?text=V" alt="Slide V"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('carouselContainer');
+        const sliders = document.querySelectorAll('.slider');
+        const menuItems = document.querySelectorAll('#menuList li');
+        const sidebar = document.getElementById('sidebar');
+
+        let currentSliderIndex = 0;
+        let currentMenuIndex = 0;
+        let currentIndices = [0, 0, 0];
+        let sidebarActive = true;
+
+        function updateSlider(sliderIndex) {
+            const sliderTrack = sliders[sliderIndex].querySelector('.slider-track');
+            const slides = sliders[sliderIndex].querySelectorAll('.slide');
+            const currentIndex = currentIndices[sliderIndex];
+            const offset = -currentIndex * (slides[0].offsetWidth + 10);
+
+            sliderTrack.style.transform = `translateX(${offset}px)`;
+
+            slides.forEach((slide, index) => {
+                if (index === currentIndex && sliders[sliderIndex].classList.contains('focused')) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
             });
-            navigator.mediaSession.setActionHandler('play', playSong);
-            navigator.mediaSession.setActionHandler('pause', pauseSong);
-            navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-            navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-          }
-          playSong();
-        }, direction ? 400 : 0);
-      }
-      // === Fungsi: Play Lagu ===
-      function playSong() {
-        audio.play();
-        isPlaying = true;
-        playPauseBtn.innerHTML = ' < i class = "fas fa-pause" > < /i>';
-      }
-      // === Fungsi: Pause Lagu ===
-      function pauseSong() {
-        audio.pause();
-        isPlaying = false;
-        playPauseBtn.innerHTML = ' < i class = "fas fa-play" > < /i>';
-      }
-      // === Fungsi: Lagu Selanjutnya ===
-      function nextSong() {
-        if (isShuffle) {
-          history.push(currentIndex);
-          let nextIndex;
-          do {
-            nextIndex = Math.floor(Math.random() * songs.length);
-          } while (nextIndex === currentIndex && songs.length > 1);
-          currentIndex = nextIndex;
-        } else {
-          currentIndex = (currentIndex + 1) % songs.length;
         }
-        loadSong(currentIndex, 'left');
-      }
-      // === Fungsi: Lagu Sebelumnya ===
-      function prevSong() {
-        if (history.length > 0) {
-          // Ambil index sebelumnya dari history dan putar
-          const prevIndex = history.pop();
-          currentIndex = prevIndex;
-          loadSong(currentIndex, 'right');
-        } else {
-          // Ulangi lagu saat ini
-          loadSong(currentIndex, 'right');
+
+        function moveSlider(sliderIndex, direction) {
+            const slides = sliders[sliderIndex].querySelectorAll('.slide');
+            currentIndices[sliderIndex] = (currentIndices[sliderIndex] + direction + slides.length) % slides.length;
+            updateSlider(sliderIndex);
         }
-      }
-      // === Fungsi: Update Progress Bar ===
-      function updateProgress() {
-        if (!isDragging && audio.duration) {
-          const percent = (audio.currentTime / audio.duration) * 100;
-          progressBar.style.width = `${percent}%`;
-          currentTimeEl.textContent = formatTime(audio.currentTime);
-          totalDurationEl.textContent = formatTime(audio.duration);
+
+        function focusSlider(index) {
+            sliders[currentSliderIndex].classList.remove('focused');
+            updateSlider(currentSliderIndex);
+
+            currentSliderIndex = index;
+            sliders[currentSliderIndex].classList.add('focused');
+            updateSlider(currentSliderIndex);
         }
-      }
-      // === Fungsi: Format Waktu (mm:ss) ===
-      function formatTime(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = Math.floor(seconds % 60);
-        return `${m}:${s < 10 ? '0' : ''}${s}`;
-      }
-      // === Fungsi: Sorot Lagu Aktif ===
-      function highlightCurrentSong() {
-        document.querySelectorAll('.playlist-item').forEach((item, i) => {
-          item.classList.toggle('active-song', i === currentIndex);
-        });
-      }
-      // === Fungsi: Tampilkan Playlist ===
-      function loadPlaylist() {
-        playlist.innerHTML = '';
-        songs.forEach((song, index) => {
-          const div = document.createElement('div');
-          div.className = 'playlist-item';
-          div.textContent = song.title;
-          div.addEventListener('click', () => {
-            history.push(currentIndex);
-            currentIndex = index;
-            loadSong(currentIndex);
-          });
-          playlist.appendChild(div);
-        });
-        highlightCurrentSong();
-      }
-      // === Fungsi: Gestur Swipe - Mulai Sentuhan ===
-      function handleTouchStart(evt) {
-        xStart = evt.touches[0].clientX;
-      }
-      // === Fungsi: Gestur Swipe - Pergerakan ===
-      function handleTouchMove(evt) {
-        xMove = evt.touches[0].clientX;
-      }
-      // === Fungsi: Gestur Swipe - Akhiri Sentuhan ===
-      function handleTouchEnd() {
-        if (!xStart || !xMove) return;
-        const diff = xStart - xMove;
-        if (Math.abs(diff) > 50) {
-          diff > 0 ? nextSong() : prevSong();
+
+        function updateMenuFocus() {
+            menuItems.forEach((item, index) => {
+                if (index === currentMenuIndex) {
+                    item.classList.add('focused');
+                } else {
+                    item.classList.remove('focused');
+                }
+            });
         }
-        xStart = xMove = null;
-      }
-      // === Event: Seek Manual via Touch ===
-      progressContainer.addEventListener('touchstart', () => isDragging = true);
-      progressContainer.addEventListener('touchmove', (e) => {
-        const rect = progressContainer.getBoundingClientRect();
-        const touchX = e.touches[0].clientX;
-        const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
-        progressBar.style.width = `${percent * 100}%`;
-        if (audio.duration) {
-          const seekTime = percent * audio.duration;
-          currentTimeEl.textContent = formatTime(seekTime);
-          totalDurationEl.textContent = formatTime(audio.duration);
+
+        function toggleSidebar(active) {
+    sidebarActive = active;
+    sidebar.classList.toggle('disabled', !active);
+
+    if (active) {
+        // Hapus fokus dari slider aktif
+        sliders[currentSliderIndex].classList.remove('focused');
+        updateSlider(currentSliderIndex);
+
+        // Fokuskan ke elemen pertama di menu sidebar
+        currentMenuIndex = 0;
+        updateMenuFocus();
+    } else {
+        // Hapus fokus dari elemen menu di sidebar
+        menuItems[currentMenuIndex].classList.remove('focused');
+    }
+}
+
+
+      document.addEventListener('keydown', (event) => {
+    if (sidebarActive) {
+        if (event.key === 'ArrowDown') {
+            currentMenuIndex = (currentMenuIndex + 1) % menuItems.length;
+            updateMenuFocus();
+        } else if (event.key === 'ArrowUp') {
+            currentMenuIndex = (currentMenuIndex - 1 + menuItems.length) % menuItems.length;
+            updateMenuFocus();
+        } else if (event.key === 'ArrowRight') {
+            toggleSidebar(false);
+            focusSlider(currentSliderIndex);
         }
-      });
-      progressContainer.addEventListener('touchend', (e) => {
-        const rect = progressContainer.getBoundingClientRect();
-        const touchX = e.changedTouches[0].clientX;
-        const percent = Math.min(Math.max((touchX - rect.left) / rect.width, 0), 1);
-        audio.currentTime = percent * audio.duration;
-        isDragging = false;
-      });
-      // === Event Listener Tombol & Audio ===
-      shuffleBtn.addEventListener('click', () => {
-        isShuffle = !isShuffle;
-        shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
-      });
-      playPauseBtn.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
-      nextBtn.addEventListener('click', nextSong);
-      prevBtn.addEventListener('click', prevSong);
-      audio.addEventListener('timeupdate', updateProgress);
-      audio.addEventListener('ended', nextSong);
-      // === Inisialisasi Awal ===
-      loadSong(currentIndex);
-      loadPlaylist();
+    } else {
+        if (event.key === 'ArrowRight') {
+            moveSlider(currentSliderIndex, 1);
+        } else if (event.key === 'ArrowLeft') {
+            moveSlider(currentSliderIndex, -1);
+        } else if (event.key === 'ArrowDown') {
+            focusSlider((currentSliderIndex + 1) % sliders.length);
+        } else if (event.key === 'ArrowUp') {
+            focusSlider((currentSliderIndex - 1 + sliders.length) % sliders.length);
+        } else if (event.key === 'Escape' || event.key === 'Backspace') {
+            toggleSidebar(true);
+        }
+    }
+});
+        // Initialize first slider and menu item as active
+        updateSlider(0);
+        updateMenuFocus();
+
+       
     </script>
-  </body>
+</body>
 </html>
