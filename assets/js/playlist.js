@@ -67,7 +67,7 @@ export const songs = [
   },
   {
     title: "Wish You Were Here",
-    artist: "Neekc Deep",
+    artist: "Neeck Deep",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Wish You Were Here.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b0/55/d0/b055d082-22b4-5c6e-6f74-e3e727e2c3d4/00790692239665-cover.jpg/592x592bb.webp"
   },
@@ -212,7 +212,7 @@ export const songs = [
   {
     title: "December (again) [feat. Mark Hoppus]",
     artist: "Neck Deep",
-    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/December (again) [feat. Mark Hoppus].mp3",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/December.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/95/6c/fd/956cfdc8-3779-99c2-bce9-1bf15a4d60af/December_Cover.jpg/500x500bb.jpg"
   },
   {
