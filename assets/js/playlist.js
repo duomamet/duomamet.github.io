@@ -193,7 +193,7 @@ export const songs = [
   },
   {
     title: "Cermin",
-    artist: "Nadin",
+    artist: "Nadin Amizah",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Cermin.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1d/10/9b/1d109b17-1bbf-1894-e774-4d9ad6baa7b3/cover.jpg/592x592bb.webp"
   },
@@ -235,7 +235,7 @@ export const songs = [
   },
   {
     title: "Fakboi",
-    artist: "DJ Ocyn & Ritz",
+    artist: "Okin & Ocan Siagian",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Fakboi.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c5/e9/c6/c5e9c695-7bda-9181-47ac-c8facaf0e72f/artwork.jpg/500x500bb.jpg"
   },
@@ -301,9 +301,9 @@ export const songs = [
   },
   {
     title: "Kekal",
-    artist: "Ziana Zain",
+    artist: "Nadin Amizah",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Kekal.mp3",
-    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/36/ee/1d/36ee1ddd-6ac4-aae4-4522-1c7a98af4106/886447503072.jpg/500x500bb.jpg"
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1d/10/9b/1d109b17-1bbf-1894-e774-4d9ad6baa7b3/cover.jpg/500x500bb.jpg"
   },
   {
     title: "Kerasnya Kota",
@@ -433,9 +433,9 @@ export const songs = [
   },
   {
     title: "P.S. I LOVE YOU",
-    artist: "How I Met Your Mother",
+    artist: "Paul Partohap",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/P.S. I LOVE YOU.mp3",
-    cover: "https://is1-ssl.mzstatic.com/image/thumb/Video49/v4/41/af/a3/41afa39a-1d9e-e4c4-9a56-f2465afd4e0d/mzl.ijuuubtg.lsr/500x500bb.jpg"
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/58/61/56/586156b6-11a9-de91-bd98-ef6995f103bc/cover.jpg/592x592bb.webp"
   },
   {
     title: "Panasea",
@@ -445,9 +445,9 @@ export const songs = [
   },
   {
     title: "penjaga hati",
-    artist: "Ari Lasso",
+    artist: "Nadhif Basamalah",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/penjaga hati.mp3",
-    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/53/c0/ba/53c0ba69-e3db-ab9f-cdc9-cf35669b6187/Ari-Lasso-1400-.jpg/500x500bb.jpg"
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/81/07/bf/8107bf80-0d4e-8f5c-9dfe-544dbf3f2dd9/cover.jpg/592x592bb.webp"
   },
   {
     title: "Pergi Hilang Dan Lupakan",
