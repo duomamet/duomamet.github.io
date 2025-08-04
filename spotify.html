@@ -161,25 +161,17 @@
   <audio id="audioPlayer" class="d-none"></audio>
 </div>
 
-<script>
-const songs = [
-  { title: "Berpayung Tuhan", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Jikalau.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
-  { title: "Tapi Diterima", artist: "Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nadin%20Amizah%20-%20Tapi%20Diterima%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/Nadin%20amizah.jpg" },
-  { title: "Forgot Password", artist: "Hindia ft. Nadin Amizah", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Hindia%20ft.%20Nadin%20Amizah%20-%20Forgot%20Password%20(Official%20Lyric%20Video).mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/hindianadin.jpg" },
-  { title: "Gagal Menjadi Manusia", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Gagal%20Menjadi%20Manusia.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Lagu Untukmu", artist: "Nidji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Nidji%20-%20Lagu%20Untukmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/nidji.jpg" },
-  { title: "Kita Bisa Bersama", artist: "Tulus", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Tulus%20-%20Kita%20Bisa%20Bersama.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/tulus.jpg" },
-  { title: "Akhirnya Ku Menemukanmu", artist: "Anji", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Anji%20-%20Akhirnya%20Ku%20Menemukanmu.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/anji.jpg" },
-  { title: "Sampai Tua Nanti", artist: "Gigi", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Gigi%20-%20Sampai%20Tua%20Nanti.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/gigi.jpg" },
-  { title: "Pergi Pagi Pulang Pagi", artist: "Slank", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Slank%20-%20Pergi%20Pagi%20Pulang%20Pagi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/slank.jpg" },
-  { title: "Laskar Pelangi", artist: "Radja", file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/Radja%20-%20Laskar%20Pelangi.mp3", cover: "https://raw.githubusercontent.com/duomamet/duomamet.github.io/refs/heads/main/radja.jpg" }
-];
+<script type="module">
+import { songs } from '/assets/js/playlist.js'; // Pastikan path sesuai lokasi file
+
+// === Variabel Utama ===
 let currentIndex = Math.floor(Math.random() * songs.length);
 let isPlaying = false;
 let isShuffle = false;
 let history = [];
 let xStart = null, xMove = null, isDragging = false;
 
+// === DOM Element Referensi ===
 const audio = document.getElementById('audioPlayer');
 const songTitle = document.getElementById('songTitle');
 const artistName = document.getElementById('artistName');
@@ -195,11 +187,13 @@ const playlist = document.getElementById('playlist');
 const currentTimeEl = document.getElementById('currentTime');
 const totalDurationEl = document.getElementById('totalDuration');
 
+// === Fungsi: Memuat Lagu ===
 function loadSong(index, direction = '') {
   const song = songs[index];
   coverArt.classList.remove('slideLeft', 'slideRight');
   void coverArt.offsetWidth;
   if (direction) coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
+
   setTimeout(() => {
     audio.src = song.file;
     songTitle.textContent = song.title;
@@ -208,45 +202,71 @@ function loadSong(index, direction = '') {
     backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
     document.title = `${song.title} - ${song.artist}`;
     highlightCurrentSong();
+
+    // ✅ Media Session API + Kontrol Notifikasi
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: song.title,
         artist: song.artist,
-        artwork: [{ src: song.cover, sizes: '512x512', type: 'image/jpeg' }]
+        artwork: [
+          { src: song.cover, sizes: '512x512', type: 'image/jpeg' }
+        ]
       });
+
+      navigator.mediaSession.setActionHandler('play', playSong);
+      navigator.mediaSession.setActionHandler('pause', pauseSong);
+      navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+      navigator.mediaSession.setActionHandler('nexttrack', nextSong);
     }
+
     playSong();
   }, direction ? 400 : 0);
 }
 
+
+// === Fungsi: Play Lagu ===
 function playSong() {
   audio.play();
   isPlaying = true;
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 }
+
+// === Fungsi: Pause Lagu ===
 function pauseSong() {
   audio.pause();
   isPlaying = false;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
+
+// === Fungsi: Lagu Selanjutnya ===
 function nextSong() {
   if (isShuffle) {
     history.push(currentIndex);
-    currentIndex = Math.floor(Math.random() * songs.length);
+    let nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * songs.length);
+    } while (nextIndex === currentIndex && songs.length > 1);
+    currentIndex = nextIndex;
   } else {
     currentIndex = (currentIndex + 1) % songs.length;
   }
   loadSong(currentIndex, 'left');
 }
+
+
+// === Fungsi: Lagu Sebelumnya ===
 function prevSong() {
   if (history.length > 0) {
     currentIndex = history.pop();
     loadSong(currentIndex, 'right');
   } else {
-    audio.currentTime = 0;
-    if (!isPlaying) playSong();
+    currentIndex = 0;
+    loadSong(currentIndex, 'right');
   }
 }
+
+
+// === Fungsi: Update Progress Bar ===
 function updateProgress() {
   if (!isDragging && audio.duration) {
     const percent = (audio.currentTime / audio.duration) * 100;
@@ -255,16 +275,22 @@ function updateProgress() {
     totalDurationEl.textContent = formatTime(audio.duration);
   }
 }
+
+// === Fungsi: Format Waktu (mm:ss) ===
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
+
+// === Fungsi: Sorot Lagu Aktif ===
 function highlightCurrentSong() {
   document.querySelectorAll('.playlist-item').forEach((item, i) => {
     item.classList.toggle('active-song', i === currentIndex);
   });
 }
+
+// === Fungsi: Tampilkan Playlist ===
 function loadPlaylist() {
   playlist.innerHTML = '';
   songs.forEach((song, index) => {
@@ -280,12 +306,18 @@ function loadPlaylist() {
   });
   highlightCurrentSong();
 }
+
+// === Fungsi: Gestur Swipe - Mulai Sentuhan ===
 function handleTouchStart(evt) {
   xStart = evt.touches[0].clientX;
 }
+
+// === Fungsi: Gestur Swipe - Pergerakan ===
 function handleTouchMove(evt) {
   xMove = evt.touches[0].clientX;
 }
+
+// === Fungsi: Gestur Swipe - Akhiri Sentuhan ===
 function handleTouchEnd() {
   if (!xStart || !xMove) return;
   const diff = xStart - xMove;
@@ -295,6 +327,7 @@ function handleTouchEnd() {
   xStart = xMove = null;
 }
 
+// === Event: Seek Manual via Touch ===
 progressContainer.addEventListener('touchstart', () => isDragging = true);
 progressContainer.addEventListener('touchmove', (e) => {
   const rect = progressContainer.getBoundingClientRect();
@@ -315,6 +348,7 @@ progressContainer.addEventListener('touchend', (e) => {
   isDragging = false;
 });
 
+// === Event Listener Tombol & Audio ===
 shuffleBtn.addEventListener('click', () => {
   isShuffle = !isShuffle;
   shuffleBtn.style.color = isShuffle ? '#1DB954' : '#fff';
@@ -325,8 +359,10 @@ prevBtn.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', nextSong);
 
+// === Inisialisasi Awal ===
 loadSong(currentIndex);
 loadPlaylist();
 </script>
+
 </body>
 </html>
