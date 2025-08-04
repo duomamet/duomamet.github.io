@@ -556,5 +556,161 @@ export const songs = [
     artist: "Last Child",
     file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Tak Pernah Ternilai.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/9f/1d/b4/9f1db43c-e116-9e26-f713-5cea81534d4c/Last_Child_-_Tak_Pernah_Ternilai.jpg/500x500bb.jpg"
+  },
+   {
+    title: "Kita Lawan Mereka",
+    artist: "Stand Here Alone",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Kita Lawan Mereka.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/d9/f1/95/d9f1953d-0a5e-7669-c8a5-28f70f6f1518/cover.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Little by Little",
+    artist: "Oasis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Little by Little.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/2a/6c/a12a6c65-fc8d-a61e-762c-42860d181bd2/884977638448.jpg/592x592bf.webp"
+  },
+  {
+    title: "Mantan",
+    artist: "Stand Here Alone",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Mantan.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music71/v4/c1/0a/d8/c10ad81d-0e36-a59a-fb14-c11556f98e71/cover.jpg/592x592bb.webp"
+  },
+  {
+    title: "Married With Children",
+    artist: "Oasis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Married With Children.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/00/af/e3/00afe365-35f8-04cb-379a-e12abead71cd/5051961070132.jpg/500x500bb.jpg"
+  },
+  {
+    title: "No Surprises",
+    artist: "Radiohead",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/No Surprises.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/60/ba/0760ba0f-148c-b18f-d0ff-169ee96f3af5/634904078164.png/592x592bb.webp"
+  },
+  {
+    title: "Pancarona",
+    artist: "The Lantis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Pancarona.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/b7/2c/96/b72c96fe-e8c3-7539-04e5-6f4c36de1fb0/cover.jpg/592x592bb.webp"
+  },
+  {
+    title: "Smells Like Teen Spirit",
+    artist: "Nirvana",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Smells Like Teen Spirit.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/fc/f9/6e/fcf96ec5-8505-ef9e-0c06-c4fdbb1ed73b/00602527829463.rgb.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Stand by Me Remastered",
+    artist: "Oasis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Stand by Me - Remastered.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/2a/6c/a12a6c65-fc8d-a61e-762c-42860d181bd2/884977638448.jpg/592x592bf.webp"
+  },
+  {
+    title: "Sunflower",
+    artist: "Rex Orange County",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Sunflower.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/92/62/09/9262094e-9d5d-bd60-dde7-478a5e5d081a/5054526415447_1.jpg/592x592bb.webp"
+  },
+    {
+    title: "Wake Me up When September Ends",
+    artist: "Greenday",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Wake Me up When September Ends.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Video122/v4/d0/4c/53/d04c532e-ca0a-0ace-0847-62003931424b/Job75e8880b-4409-4b22-872b-4a2ab7bd1669-138891124-PreviewImage_preview_image_nonvideo_sdr-Time1668123397619.png/592x592bb.webp"
+  },
+  {
+    title: "Wonderwall Remastered",
+    artist: "Oasis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Wonderwall - Remastered.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/04/92/e0/0492e08b-cbcc-9969-9ad6-8f5a0888068c/5051961007107.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Yellow",
+    artist: "Coldplay",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Yellow.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f5/93/8c/f5938c49-964c-31d1-4b33-78b634f71fb7/190295978075.jpg/500x500bb.jpg"
+  },
+  {
+    title: "21 Guns",
+    artist: "Green Day",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/21 Guns.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b8/36/d6/b836d655-7ef3-5c93-734e-fb77c4981308/mzi.opxridrf.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Alive",
+    artist: "Stereo Wall",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Alive.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a4/44/65/a4446571-c772-c12f-ce34-71bfdbcd4bf7/24UMGIM29305.rgb.jpg/592x592bb.webp"
+  },
+  {
+    title: "All The Small Things",
+    artist: "blink-182",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/All The Small Things.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c1/3d/86/c13d8619-0794-ceee-6b1b-d0709119a9cf/16UMGIM35657.rgb.jpg/500x500bb.jpg"
+  },
+  {
+    title: "American Idiot",
+    artist: "Green Day",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/American Idiot.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music/9e/17/c2/mzi.ofggkufy.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Basket Case",
+    artist: "Green Day",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Basket Case.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/88/83/e7/8883e74b-1b7c-0725-09de-21e4e00d54b5/093624915713.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Best Friend",
+    artist: "Rex Orange County",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Best Friend.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0c/91/b6/0c91b6a8-f22c-5259-0e0b-466db559ef98/5054526415454_1.jpg/592x592bb.webp"
+  },
+  {
+    title: "Boulevard of Broken Dreams",
+    artist: "Green Day",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Boulevard of Broken Dreams.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music/f2/be/03/mzi.uxygrgff.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Creep",
+    artist: "Radiohead",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Creep.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/eb/df/56/ebdf56ab-2824-74ae-cdcb-c98f565e0a0a/634904079765.png/592x592bb.webp"
+  },
+  {
+    title: "Diary Depresiku",
+    artist: "Last Child",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Diary Depresiku.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/1c/0a/8f/1c0a8f00-5b81-67ad-44fa-713c5fe9d0f9/Last_Child_-Everything_We_Are_Everything.jpg/500x500bb.jpg"
+  },
+  {
+    title: "Don't Look Back in Anger   Remastered",
+    artist: "Oasis",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Don't Look Back in Anger - Remastered.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/04/92/e0/0492e08b-cbcc-9969-9ad6-8f5a0888068c/5051961007107.jpg/500x500bb.jpg"
+  },
+  {
+    title: "First Date",
+    artist: "blink-182",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/First Date.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/14/21/9e/14219e31-3ef9-2311-7691-082bd52bc2a7/16UMGIM35660.rgb.jpg/592x592bb.webp"
+  },
+  {
+    title: "Forget Jakarta",
+    artist: "Adhitia Sofyan",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Forget Jakarta.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/73/27/31/732731e8-2389-927c-cf6d-2e4c4370eb2a/724997789389.png/500x500bb.jpg"
+  },
+  {
+    title: "I Miss You",
+    artist: "blink-182",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/I Miss You.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/57/be/19/57be194f-7b85-86ed-f59b-afc86806b6e5/16UMGIM35664.rgb.jpg/592x592bb.webp"
+  },
+  {
+    title: "Jav",
+    artist: "Stand Here Alone",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Jav.mp3",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/d9/f1/95/d9f1953d-0a5e-7669-c8a5-28f70f6f1518/cover.jpg/592x592bf.webp"
   }
 ];
