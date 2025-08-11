@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playlist Generator - Dark Mode</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+
+  <style>
+      body {
+    background-color: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  textarea {
+  color: #4b4b4b; /* ini buat teks yang diketik */
+  background-color: transparent; /* kalau kamu mau transparan juga */
+  border: 1px solid #ccc;
+}
+
+  textarea.form-control {
+  background-color: #161b22 !important;
+  color: rgba(255, 255, 255, 0.8); /* <== teks aktif saat mengetik */
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  resize: vertical;
+  box-shadow: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea.form-control:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.2);
+  outline: none;
+}
+
+textarea.form-control {
+  background-color: #111 !important; /* gelap */
+  color: #c9d1d9 !important;            /* warna teks */
+  border: 1px solid #444 !important;
+}
+
+textarea.form-control::placeholder {
+  color: #8b949e !important; /* warna placeholder */
+  opacity: 1 !important;
+}
+
+textarea.form-control {
+  resize: none;
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; 
+}
+
+  .card {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+  }
+
+  .form-label {
+    color: #8b949e;
+    font-weight: 500;
+  }
+
+  .btn-success {
+    background-color: #238636;
+    border: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-success:hover {
+    background-color: #2ea043;
+    box-shadow: 0 0 10px #2ea04377;
+  }
+
+  .btn-outline-secondary {
+    border-color: #444c56;
+    color: #c9d1d9;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: #30363d;
+    color: #fff;
+  }
+
+  pre {
+    background-color: #0d1117;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    overflow-x: auto;
+  }
+
+  .toast-container {
+    position: fixed;
+    top: 2rem;
+    right: 1rem;
+    z-index: 9999;
+  }
+
+  .text-muted {
+    color: #8b949e !important;
+  }
+
+  pre {
+  overflow: hidden;       /* Hilangkan scrollbar */
+  white-space: pre-wrap;  /* Bungkus teks biar nggak horizontal scroll */
+  word-wrap: break-word;  /* Paksa kata panjang dipotong biar wrap */
+}
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Toast -->
+<div class="toast-container">
+  <div id="toastSuccess" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">
+        berhasil disalin ke clipboard!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/839px-Spotify_logo_with_text.svg.png" 
+           alt="Spotify Logo" 
+           style="height: 40px; margin-right: 10px;">
+      <h1 class="h4 mb-0"><span class="text-muted">Generator</span></h1>
+    </div>
+  </div>
+
+
+  <div class="card shadow-lg">
+    <div class="card-body">
+      
+      <textarea id="input" spellcheck="false" class="form-control mb-3" rows="5" placeholder="masukan content"></textarea>
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="btn btn-success" onclick="generate()">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+ 
+        </button>
+        <button class="btn btn-outline-secondary" onclick="validateLinks()">
+  <i class="fas fa-check me-1"></i>
+</button>
+<button class="btn btn-outline-secondary" onclick="sortByArtist()">
+  <i class="fas fa-sort-alpha-down me-1"></i> 
+</button>
+<button class="btn btn-outline-secondary" onclick="copyOutput()">
+          <i class="fas fa-copy me-1"></i> 
+        </button>
+      </div>
+
+      <div id="progress" class="text-muted mb-2 d-none">
+        <i class="fas fa-spinner fa-spin me-2"></i> memuat metadata...
+      </div>
+
+      
+      <pre id="output" class="mb-0"> log akan muncul disini</pre>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ==============================
+// 🔄 Generate Playlist Function
+// ==============================
+const outputEl = document.getElementById("output");
+const progressEl = document.getElementById("progress");
+
+async function generate() {
+  const text = document.getElementById("input").value.trim();
+  const lines = text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && line.includes('.mp3'));
+
+  if (lines.length === 0) {
+    outputEl.textContent = "⚠️ pastikan format http://url/title.mp3 atau http://url/title.mp3?a=artist untuk memperkuat query.";
+    return;
+  }
+
+  progressEl.classList.remove("d-none");
+  outputEl.textContent = "";
+
+  const songs = [];
+
+  for (const url of lines) {
+    const fileOnly = url.split('.mp3')[0] + '.mp3';
+
+    const fileNameRaw = fileOnly.split('/').pop();
+    const baseName = fileNameRaw.replace('.mp3', '');
+    const fallbackTitle = baseName.replace(/\s+/g, ' ').trim();
+
+    let searchTitle = baseName.trim();
+    let artistParam = null;
+
+    const contentIndex = url.indexOf("?a=");
+    if (contentIndex !== -1) {
+      artistParam = decodeURIComponent(url.substring(contentIndex + 3)).trim();
+      searchTitle = `${baseName} ${artistParam}`;
+    }
+
+    const query = encodeURIComponent(searchTitle);
+
+    let artist = null;
+    let title = fallbackTitle;
+    let cover = null;
+
+    try {
+      const res = await fetch(`https://itunes.apple.com/search?term=${query}&limit=15`);
+      const data = await res.json();
+
+      if (data.results.length > 0) {
+        let match = null;
+
+        if (artistParam) {
+          match = data.results.find(r =>
+            r.artistName.toLowerCase().includes(artistParam.toLowerCase())
+          );
+        }
+
+        const best = match || data.results[0];
+
+        title = best.trackName || fallbackTitle;
+        artist = best.artistName || null;
+        if (artist && best.collectionName) {
+          artist = `${artist} - ${best.collectionName}`; // Tambah album
+        }
+        cover = best.artworkUrl100?.replace('100x100bb', '500x500bb') || null;
+      }
+    } catch (e) {
+      console.warn("Gagal fetch:", searchTitle, e);
+    }
+
+    songs.push(
+`  {
+    title: "${title}",
+    artist: ${artist ? `"${artist}"` : null},
+    file: "${fileOnly}",
+    cover: ${cover ? `"${cover}"` : null}
+  }`);
+  }
+
+  const output = `export const songs = [\n${songs.join(',\n')}\n];`;
+  outputEl.textContent = output;
+  progressEl.classList.add("d-none");
+}
+
+
+
+
+
+
+// ==============================
+// 📋 Copy Output Function
+// ==============================
+function copyOutput() {
+  const output = outputEl.textContent;
+  if (!output || output === "Menunggu input...") return;
+
+  navigator.clipboard.writeText(output).then(() => {
+    const toast = new bootstrap.Toast(document.getElementById("toastSuccess"));
+    toast.show();
+  }).catch(err => {
+    alert("Gagal menyalin: " + err);
+  });
+}
+
+// ==============================
+// ✅ Validate MP3 Links Function
+// ==============================
+async function validateLinks() {
+  const text = document.getElementById("input").value.trim();
+  const lines = text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && line.includes('.mp3'));
+
+  if (lines.length === 0) {
+    outputEl.textContent = "⚠️ tidak ada link mp3 valid.";
+    return;
+  }
+
+  outputEl.textContent = "validating links...";
+  const results = [];
+
+  for (const url of lines) {
+    // Hapus query string setelah .mp3 (misal ?a=whatever)
+    const cleanUrl = url.split('.mp3')[0] + '.mp3';
+
+    // Ambil nama file tanpa path dan tanpa ekstensi
+    const fileNameRaw = cleanUrl.split('/').pop();
+    const baseName = fileNameRaw.replace('.mp3', '');
+
+    // Bersihkan tanda - dan _
+    const cleanTitle = baseName
+      .replace(/[-_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const audio = new Audio();
+    audio.src = cleanUrl;
+
+    const result = await new Promise(resolve => {
+      audio.addEventListener("canplaythrough", () => {
+        resolve(`✅ <span>${cleanTitle}</span>`);
+      }, { once: true });
+
+      audio.addEventListener("error", () => {
+        resolve(`❌ <span>${cleanTitle}</span>`);
+      }, { once: true });
+
+      setTimeout(() => {
+        resolve(`❌ <span>${cleanTitle}</span>`);
+      }, 5000);
+    });
+
+    results.push(result);
+  }
+
+  outputEl.innerHTML = results.join("<br>");
+}
+
+// ==============================
+// 🔤 Sort Playlist by Artist
+// ==============================
+function sortByArtist() {
+  const inputText = document.getElementById("input").value.trim();
+
+  if (!inputText.startsWith("export const songs = [")) {
+    outputEl.textContent = "⚠️ playlist tidak ditemukan.";
+    return;
+  }
+
+  const matches = inputText.match(/export const songs = \[(.*)\];?$/s);
+  if (!matches || matches.length < 2) {
+    outputEl.textContent = "⚠️ format playlist tidak valid.";
+    return;
+  }
+
+  const rawItems = matches[1];
+  const songBlocks = rawItems.match(/\{[\s\S]*?\}/g);
+
+  if (!songBlocks || songBlocks.length === 0) {
+    outputEl.textContent = "⚠️ tidak ada lagu ditemukan.";
+    return;
+  }
+
+  const songs = songBlocks.map(block => {
+    const titleMatch = block.match(/title:\s*"([^"]+)"/);
+    const artistMatch = block.match(/artist:\s*(null|"[^"]*")/);
+    const fileMatch = block.match(/file:\s*"([^"]+)"/);
+    const coverMatch = block.match(/cover:\s*(null|"[^"]*")/);
+
+    return {
+      title: titleMatch ? titleMatch[1] : null,
+      artist: artistMatch ? (artistMatch[1] === "null" ? null : artistMatch[1].replace(/"/g, "")) : null,
+      file: fileMatch ? fileMatch[1] : null,
+      cover: coverMatch ? (coverMatch[1] === "null" ? null : coverMatch[1].replace(/"/g, "")) : null
+    };
+  });
+
+  songs.sort((a, b) => {
+    if (!a.artist) return 1;
+    if (!b.artist) return -1;
+    return a.artist.localeCompare(b.artist);
+  });
+
+  const sortedOutput = `export const songs = [\n${songs.map(song => {
+    return `  {\n    title: "${song.title}",\n    artist: ${song.artist ? `"${song.artist}"` : null},\n    file: "${song.file}",\n    cover: ${song.cover ? `"${song.cover}"` : null}\n  }`;
+  }).join(",\n")}\n];`;
+
+  outputEl.textContent = sortedOutput;
+}
+
+</script>
+
+</body>
+</html>
