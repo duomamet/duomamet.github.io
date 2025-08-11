@@ -38,12 +38,12 @@ Proyek ini dibuat untuk memudahkan proses **pengelolaan daftar lagu** agar rapi,
 ---
 
 ## 📂 Struktur Folder
-│── index.html # Halaman utama
-│── playlist.html # Pembuat Daftar Putar
-│── style.css # Styling
-│── script.js # Logika utama
-│── playlist.js # Database referensi musik
-│── README.md # Dokumentasi proyek
+├── index.html   # Halaman utama
+├── style.css    # File styling (tampilan)
+├── script.js    # Logika utama aplikasi
+├── data.json    # Database referensi musik
+└── README.md    # Dokumentasi proyek
+
 
 
 ---
