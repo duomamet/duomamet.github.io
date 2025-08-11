@@ -1,322 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23A9A9A9' d='M96 64h320c17.7 0 32 14.3 32 32V320c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32zm0 384h320c17.7 0 32 14.3 32 32s-14.3 32-32 32H96c-17.7 0-32-14.3-32-32s14.3-32 32-32z'/%3E%3C/svg%3E">
+function loadSong(index, direction = '') {
+      const song = songs[index];
+      coverArt.classList.remove('slideLeft', 'slideRight');
+      void coverArt.offsetWidth;
+      if (direction) coverArt.classList.add(direction === 'left' ? 'slideLeft' : 'slideRight');
 
-    <title>eBox - Nonton Gratis</title>
-     
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-        body {
-            font-family: Roboto;
-            background-color: #000;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            color: white;
-            overflow: hidden;
+      setTimeout(() => {
+        audio.src = song.file;
+        songTitle.textContent = song.title;
+        artistName.textContent = song.artist;
+        coverArt.style.backgroundImage = `url('${song.cover}')`;
+        backgroundBlur.style.backgroundImage = `url('${song.cover}')`;
+        document.title = `${song.title} - ${song.artist}`;
+        highlightCurrentSong();
+
+        // Media Session API
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: song.title,
+            artist: song.artist,
+            artwork: [
+              { src: song.cover, sizes: '512x512', type: 'image/jpeg' }
+            ]
+          });
+
+          navigator.mediaSession.setActionHandler('play', playSong);
+          navigator.mediaSession.setActionHandler('pause', pauseSong);
+          navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+          navigator.mediaSession.setActionHandler('nexttrack', nextSong);
         }
 
-        .sidebar {
-            width: 220px;
-            background-color: #222;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-            align-items: stretch;
-            margin-right: 20px;
-            
-        }
+        playSong();  // langsung autoplay
 
-          .sidebar.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            width: 80px;
-        }
-
-        .sidebar h2 { 
-            color: green;
-            margin-bottom: 30px;
-            font-size: 40px;
-            text-align: center;
-            text-transform: none;
-        }
-
-        
-
-       .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            text-align: left; /* Tetap rata kiri */
-        }
-
-        .sidebar ul li {
-            margin-bottom: 15px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 20px;
-        }
-
-        .sidebar ul li.focused {
-            background-color: #3d3d3d; /* Background abu-abu gelap */
-    border: 2px solid #3d3d3d; /* Border abu-abu gelap */
-    padding: 4px 8px; /* Penyesuaian padding untuk memperhatikan border */
-        }
-
-        .sidebar ul li:last-child.focused {
-        background-color: red; /* Background merah */
-            border: 2px solid red; /* Border merah */
-            padding: 4px 8px; /* Penyesuaian padding untuk memperhatikan border */
-    
-}
-        .sidebar ul li:last-child {
-            margin-top: 40px;
-        }
-
-        .text{
-            margin-left: 5px;
-        }
-
-    
-       /* Menyembunyikan teks saat sidebar dinonaktifkan */
-.sidebar.disabled ul li .text {
-    display: none;
-}
-
-
-/* Mengatur ukuran ikon lebih besar saat sidebar dinonaktifkan */
-.sidebar.disabled ul li span {
-    font-size: 24px;
-}
-
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 20px;
-            overflow: hidden;
-            align-items: flex-start; /* Mengatur posisi slider agar lebih dekat ke sidebar */
-        }
-
-        .slider {
-            display: flex;
-            overflow: visible;
-            width: 80%;
-            position: relative;
-        }
-
-        .slider-track {
-            display: flex;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .slide {
-            width: 240px;
-            height: 135px;
-            margin: 0 5px;
-            background-color: #444;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            border-radius: 10px;
-            opacity: 0.5;
-            transform: scale(0.8);
-        }
-
-        .slide.active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 0.3s, transform 0.3s, border 0.3s;
-        }
-
-
-        .slide img {
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .slider.focused {
-            padding: 10px;
-            border-radius: 12px;
-        }
-
-        .slider:not(.focused) .slide {
-            transition: none;
-        }
-
-        .slider:not(.focused) .slide.active {
-            opacity: 0.5;
-            transform: scale(0.8);
-        }
-img{
-  text-indent:-9999px;
-    text-align: center;
-}
-      
-    </style>
-</head>
-<body>
-    <div class="sidebar" id="sidebar">
-        <h2><i class="fab fa-android"></i></h2>
-        <ul id="menuList">
-    <li><span class="fas fa-tv"></span><span class="text">Local</span></li>
-    <li><span class="fas fa-film"></span><span class="text">Entertainment</span></li>
-    <li><span class="fas fa-football-ball"></span><span class="text">Sports</span></li>
-    <li><span class="fas fa-book"></span><span class="text">Knowledge</span></li>
-    <li><span class="fas fa-video"></span><span class="text">Movies</span></li>
-    <li><span class="fas fa-info-circle"></span><span class="text">About</span></li>
-    <li><span class="fas fa-power-off"></span><span class="text">Exit</span></li>
-</ul>
-
-    </div>
-
-    <div class="main" id="carouselContainer">
-        <div class="slider" id="slider1">
-            <div class="slider-track" id="sliderTrack1">
-                <div class="slide active"><img src="https://via.placeholder.com/200x120?text=1" alt="Slide 1"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=2" alt="Slide 2"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=3" alt="Slide 3"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=4" alt="Slide 4"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=5" alt="Slide 5"></div>
-            </div>
-        </div>
-
-        <div class="slider" id="slider2">
-            <div class="slider-track" id="sliderTrack2">
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=A" alt="Slide A"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=B" alt="Slide B"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=C" alt="Slide C"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=D" alt="Slide D"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=E" alt="Slide E"></div>
-            </div>
-        </div>
-
-        <div class="slider" id="slider3">
-            <div class="slider-track" id="sliderTrack3">
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=I" alt="Slide I"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=II" alt="Slide II"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=III" alt="Slide III"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=IV" alt="Slide IV"></div>
-                <div class="slide"><img src="https://via.placeholder.com/200x120?text=V" alt="Slide V"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const container = document.getElementById('carouselContainer');
-        const sliders = document.querySelectorAll('.slider');
-        const menuItems = document.querySelectorAll('#menuList li');
-        const sidebar = document.getElementById('sidebar');
-
-        let currentSliderIndex = 0;
-        let currentMenuIndex = 0;
-        let currentIndices = [0, 0, 0];
-        let sidebarActive = true;
-
-        function updateSlider(sliderIndex) {
-            const sliderTrack = sliders[sliderIndex].querySelector('.slider-track');
-            const slides = sliders[sliderIndex].querySelectorAll('.slide');
-            const currentIndex = currentIndices[sliderIndex];
-            const offset = -currentIndex * (slides[0].offsetWidth + 10);
-
-            sliderTrack.style.transform = `translateX(${offset}px)`;
-
-            slides.forEach((slide, index) => {
-                if (index === currentIndex && sliders[sliderIndex].classList.contains('focused')) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
-            });
-        }
-
-        function moveSlider(sliderIndex, direction) {
-            const slides = sliders[sliderIndex].querySelectorAll('.slide');
-            currentIndices[sliderIndex] = (currentIndices[sliderIndex] + direction + slides.length) % slides.length;
-            updateSlider(sliderIndex);
-        }
-
-        function focusSlider(index) {
-            sliders[currentSliderIndex].classList.remove('focused');
-            updateSlider(currentSliderIndex);
-
-            currentSliderIndex = index;
-            sliders[currentSliderIndex].classList.add('focused');
-            updateSlider(currentSliderIndex);
-        }
-
-        function updateMenuFocus() {
-            menuItems.forEach((item, index) => {
-                if (index === currentMenuIndex) {
-                    item.classList.add('focused');
-                } else {
-                    item.classList.remove('focused');
-                }
-            });
-        }
-
-        function toggleSidebar(active) {
-    sidebarActive = active;
-    sidebar.classList.toggle('disabled', !active);
-
-    if (active) {
-        // Hapus fokus dari slider aktif
-        sliders[currentSliderIndex].classList.remove('focused');
-        updateSlider(currentSliderIndex);
-
-        // Fokuskan ke elemen pertama di menu sidebar
-        currentMenuIndex = 0;
-        updateMenuFocus();
-    } else {
-        // Hapus fokus dari elemen menu di sidebar
-        menuItems[currentMenuIndex].classList.remove('focused');
+      }, direction ? 400 : 0);
     }
-}
-
-
-      document.addEventListener('keydown', (event) => {
-    if (sidebarActive) {
-        if (event.key === 'ArrowDown') {
-            currentMenuIndex = (currentMenuIndex + 1) % menuItems.length;
-            updateMenuFocus();
-        } else if (event.key === 'ArrowUp') {
-            currentMenuIndex = (currentMenuIndex - 1 + menuItems.length) % menuItems.length;
-            updateMenuFocus();
-        } else if (event.key === 'ArrowRight') {
-            toggleSidebar(false);
-            focusSlider(currentSliderIndex);
-        }
-    } else {
-        if (event.key === 'ArrowRight') {
-            moveSlider(currentSliderIndex, 1);
-        } else if (event.key === 'ArrowLeft') {
-            moveSlider(currentSliderIndex, -1);
-        } else if (event.key === 'ArrowDown') {
-            focusSlider((currentSliderIndex + 1) % sliders.length);
-        } else if (event.key === 'ArrowUp') {
-            focusSlider((currentSliderIndex - 1 + sliders.length) % sliders.length);
-        } else if (event.key === 'Escape' || event.key === 'Backspace') {
-            toggleSidebar(true);
-        }
-    }
-});
-        // Initialize first slider and menu item as active
-        updateSlider(0);
-        updateMenuFocus();
-
-       
-    </script>
-</body>
-</html>
