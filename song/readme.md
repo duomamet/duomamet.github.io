@@ -38,3 +38,28 @@ Proyek ini dibuat untuk memudahkan proses **pengelolaan daftar lagu** agar rapi,
 ---
 
 ## 📂 Struktur Folder
+│── index.html # Halaman utama
+│── playlist.html # Pembuat Daftar Putar
+│── style.css # Styling
+│── script.js # Logika utama
+│── playlist.js # Database referensi musik
+│── README.md # Dokumentasi proyek
+
+
+---
+
+## 📖 Cara Menggunakan
+1. **Buka halaman `index.html`** di browser.
+2. **Tempel daftar link** musik ke dalam textarea input.
+3. Klik tombol **"Generate"**.
+4. Hasil format dan pencocokan akan muncul di output area.
+5. **Salin hasil** atau gunakan sesuai kebutuhan.
+
+---
+
+## ⚙️ Konfigurasi
+Parameter utama yang bisa diubah di `script.js`:
+```javascript
+const MATCH_LIMIT = 15;      // Jumlah maksimal kandidat pencocokan
+const SIMILARITY_THRESHOLD = 0.85; // Tingkat kemiripan minimal
+
