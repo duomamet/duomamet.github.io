@@ -38,8 +38,7 @@ Proyek ini dibuat untuk memudahkan proses **pengelolaan daftar lagu** agar rapi,
 ---
 
 ## 📂 Struktur Folder
-
-📂 Proyek Playlist Generator  
+  
 ├── index.html   # Halaman utama  
 ├── style.css    # File styling (tampilan)  
 ├── script.js    # Logika utama aplikasi  
