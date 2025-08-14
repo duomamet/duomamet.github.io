@@ -296,7 +296,7 @@ export const songs = [
   {
     title: "Pergi Hilang Dan Lupakan",
     artist: "Remember of Today",
-    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Pergi Hilang dan Lupakan.mp3",
+    file: "https://github.com/duomamet/duomamet.github.io/raw/refs/heads/main/song/Pergi Hilang Dan Lupakan.mp3",
     cover: "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/8d/16/cd/8d16cd9d-e646-a8c9-d24d-2799313dd4ae/cover.jpg/500x500bb.jpg"
   },
   {
